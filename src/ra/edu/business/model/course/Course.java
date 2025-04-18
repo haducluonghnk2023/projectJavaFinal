@@ -5,13 +5,14 @@ import ra.edu.validate.course.CourseValidator;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Scanner;
 
-public class Course implements InputTable {
+public class Course implements InputTable<Course> {
     @Override
-    public void inputData(Scanner sc) {
-        // Nhập tên khóa học
-        this.name = CourseValidator.validateCourseName(sc);
+    public void inputData(Scanner sc, List<Course> courseList) {
+        // Nhập tên khóa học (có kiểm tra trùng tên và chuẩn hóa)
+        this.name = CourseValidator.validateCourseName(sc, courseList);
 
         // Nhập thời lượng khóa học
         this.duration = CourseValidator.validateDuration(sc);
@@ -19,6 +20,7 @@ public class Course implements InputTable {
         // Nhập tên giảng viên
         this.instructor = CourseValidator.validateInstructor(sc);
 
+        // Ghi thời điểm tạo
         this.createAt = LocalDateTime.now();
     }
 
@@ -85,12 +87,12 @@ public class Course implements InputTable {
     @Override
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        return "Khóa học #" + id +
-                " | Tên: " + name +
-                " | Thời lượng: " + duration + " buổi" +
-                " | Giảng viên: " + instructor +
-                " | Ngày tạo: " + createAt.format(formatter);
+        return String.format("| %-5s | %-40s | %-10s | %-15s | %-12s |",
+                id,
+                name,
+                duration + " buổi",
+                instructor,
+                createAt.format(formatter)
+        );
     }
-
-
 }

@@ -8,4 +8,6 @@ import java.util.List;
 public interface CourseDAO extends AppDAO {
     List<Course> getPageData(int page, int size);
     int getTotalCourses();
+    List<Course> searchByName(String keyword);
+    List<Course> getSortedPaged(String sortColumn, String sortOrder, int page, int pageSize);
 }

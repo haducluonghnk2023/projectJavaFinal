@@ -2,6 +2,7 @@ package ra.edu.business.service.auth;
 
 import ra.edu.business.dao.auth.AuthDAO;
 import ra.edu.business.dao.auth.AuthDAOImp;
+import ra.edu.business.model.account.Account;
 import ra.edu.business.model.admin.Admin;
 import ra.edu.business.model.student.Student;
 
@@ -11,16 +12,19 @@ public class AuthServiceImp implements AuthService {
     private final AuthDAO authDAO = new AuthDAOImp();
 
     @Override
-    public Object login(String username, String password) {
-        Admin admin = authDAO.adminLogin(username, password);
-        if (admin != null) {
-            currentUser = admin;
-            return admin;
-        }
-        Student student = authDAO.studentLogin(username, password);
-        if (student != null) {
-            currentUser = student;
-            return student;
+    public Object login(String email, String password) {
+        Account account = authDAO.accountLogin(email, password);
+        if (account != null) {
+            switch (account.getRole()) {
+                case ADMIN:
+                    currentUser = account;
+                    return account;
+                case STUDENT:
+                    currentUser = account;
+                    return account;
+                default:
+                    return null;
+            }
         }
         return null;
     }

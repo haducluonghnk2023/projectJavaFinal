@@ -7,5 +7,5 @@ public interface AppService<T> {
     T getById(int id);
     boolean save(T t);
     boolean update(T t);
-    boolean delete(String id);
+    boolean delete(int id);
 }

@@ -1,11 +1,13 @@
 package ra.edu.business.model.student;
 
 import ra.edu.business.model.InputTable;
+import ra.edu.business.model.course.Course;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 
-public class Student implements InputTable {
+public class Student implements InputTable<Student> {
     private int id;
     private String name;
     private Date birthday;
@@ -107,8 +109,9 @@ public class Student implements InputTable {
                 '}';
     }
 
+
     @Override
-    public void inputData(Scanner sc) {
+    public void inputData(Scanner sc, List<Student> list) {
 
     }
 }

@@ -17,7 +17,7 @@ public class StudentUI {
             System.out.println(Color.YELLOW + "5. Sắp xếp khóa học" + Color.RESET);
             System.out.println(Color.YELLOW + "6. Hủy đăng ký khóa học" + Color.RESET);
             System.out.println(Color.YELLOW + "7. Đổi mật khẩu tài khoản" + Color.RESET);
-            System.out.println(Color.YELLOW + "8. Đăng xuất" + Color.RESET);
+            System.out.println(Color.RED + "8. Đăng xuất" + Color.RESET);
             System.out.print(Color.RESET + "Chọn tùy chọn: " + Color.RESET);
             int choice = MainApplication.sc.nextInt();
             MainApplication.sc.nextLine();
@@ -44,7 +44,7 @@ public class StudentUI {
                 case 7 :
                     break;
                 case 8:
-                    System.out.println(Color.GREEN + "Đăng xuất thành công!" + Color.RESET);
+                    System.out.println(Color.GREEN + "Bạn đã đăng xuất!" + Color.RESET);
                     continueProgram = false;
                     AuthUI.login();
                     break;

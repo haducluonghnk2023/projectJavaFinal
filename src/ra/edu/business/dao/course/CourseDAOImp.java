@@ -2,6 +2,7 @@ package ra.edu.business.dao.course;
 
 import ra.edu.business.config.ConnectionDB;
 import ra.edu.business.model.course.Course;
+import ra.edu.utils.Color;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -12,9 +13,31 @@ import java.util.List;
 
 public class CourseDAOImp implements CourseDAO {
     @Override
-    public List findAll() {
-        return List.of();
+    public List<Course> findAll() {
+        List<Course> courses = new ArrayList<>();
+        String sql = "{CALL GetAllCourses()}";
+
+        try (Connection conn = ConnectionDB.openConnection();
+             CallableStatement callSt = conn.prepareCall(sql);
+             ResultSet rs = callSt.executeQuery()) {
+
+            while (rs.next()) {
+                Course course = new Course();
+                course.setId(rs.getInt("id"));
+                course.setName(rs.getString("name"));
+                course.setDuration(rs.getInt("duration"));
+                course.setInstructor(rs.getString("instructor"));
+                course.setCreateAt(rs.getTimestamp("create_at").toLocalDateTime());
+                courses.add(course);
+            }
+
+        } catch (SQLException e) {
+            System.err.println(Color.RED + "Lỗi khi truy xuất tất cả khóa học: " + e.getMessage() + Color.RESET);
+        }
+
+        return courses;
     }
+
 
     @Override
     public Object findById(int id) {
@@ -35,7 +58,7 @@ public class CourseDAOImp implements CourseDAO {
                 return course;
             }
         } catch (SQLException e) {
-            System.err.println("Lỗi khi tìm khóa học theo ID: " + e.getMessage());
+            System.out.println(Color.RED + "Lỗi khi tìm khóa học theo ID: " + e.getMessage() + Color.RESET);
         }
         return null;
     }
@@ -56,7 +79,7 @@ public class CourseDAOImp implements CourseDAO {
             return rowsAffected > 0;
 
         } catch (SQLException e) {
-            System.err.println("Error inserting course: " + e.getMessage());
+            System.out.println(Color.RED + "Lỗi khi chèn khóa học: " + e.getMessage() + Color.RESET);
             return false;
         }
     }
@@ -78,15 +101,33 @@ public class CourseDAOImp implements CourseDAO {
             return rowsAffected > 0;
 
         } catch (SQLException e) {
-            System.err.println("Error updating course: " + e.getMessage());
+            System.out.println(Color.RED + "Lỗi khi cập nhật khóa học: " + e.getMessage() + Color.RESET);
             return false;
         }
     }
 
     @Override
-    public boolean delete(String id) {
-        return false;
+    public boolean delete(int id) {
+        String sql = "{CALL DeleteCourseById(?)}";
+
+        try (Connection conn = ConnectionDB.openConnection();
+             CallableStatement callSt = conn.prepareCall(sql)) {
+
+            callSt.setInt(1, id);
+            callSt.execute();
+
+            return true;
+
+        } catch (SQLException e) {
+            if ("45000".equals(e.getSQLState())) {
+                System.out.println(Color.YELLOW + e.getMessage() + Color.RESET);
+            } else {
+                System.out.println(Color.RED + "Lỗi khi xóa khóa học: " + e.getMessage() + Color.RESET);
+            }
+            return false;
+        }
     }
+
 
     @Override
     public List<Course> getPageData(int page, int size) {
@@ -112,7 +153,7 @@ public class CourseDAOImp implements CourseDAO {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving paginated courses: " + e.getMessage());
+            System.err.println(Color.RED + "Lỗi khi truy xuất các khóa học được phân trang: " + e.getMessage() + Color.RESET);
         }
 
         return courses;
@@ -132,9 +173,70 @@ public class CourseDAOImp implements CourseDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println("Lỗi khi gọi GetTotalCourses: " + e.getMessage());
+            System.err.println(Color.RED + "Lỗi khi gọi GetTotalCourses: " + e.getMessage() + Color.RESET);
         }
 
         return total;
     }
+
+    @Override
+    public List<Course> searchByName(String keyword) {
+        List<Course> courses = new ArrayList<>();
+        String sql = "{CALL SearchCoursesByName(?)}";
+
+        try (Connection conn = ConnectionDB.openConnection();
+             CallableStatement callSt = conn.prepareCall(sql)) {
+
+            callSt.setString(1, keyword);
+
+            try (ResultSet rs = callSt.executeQuery()) {
+                while (rs.next()) {
+                    Course course = new Course();
+                    course.setId(rs.getInt("id"));
+                    course.setName(rs.getString("name"));
+                    course.setDuration(rs.getInt("duration"));
+                    course.setInstructor(rs.getString("instructor"));
+                    course.setCreateAt(rs.getTimestamp("create_at").toLocalDateTime());
+
+                    courses.add(course);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println(Color.RED + "Lỗi khi tìm kiếm khóa học theo tên: " + e.getMessage() + Color.RESET);
+        }
+        return courses;
+    }
+
+    @Override
+    public List<Course> getSortedPaged(String sortColumn, String sortOrder, int page, int pageSize) {
+        List<Course> courses = new ArrayList<>();
+        String sql = "{CALL GetCoursesSortedPaged(?, ?, ?, ?)}";
+
+        try (Connection conn = ConnectionDB.openConnection();
+             CallableStatement callSt = conn.prepareCall(sql)) {
+
+            callSt.setString(1, sortColumn);
+            callSt.setString(2, sortOrder);
+            callSt.setInt(3, page);
+            callSt.setInt(4, pageSize);
+
+            try (ResultSet rs = callSt.executeQuery()) {
+                while (rs.next()) {
+                    Course course = new Course();
+                    course.setId(rs.getInt("id"));
+                    course.setName(rs.getString("name"));
+                    course.setDuration(rs.getInt("duration"));
+                    course.setInstructor(rs.getString("instructor"));
+                    course.setCreateAt(rs.getTimestamp("create_at").toLocalDateTime());
+
+                    courses.add(course);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return courses;
+    }
+
 }

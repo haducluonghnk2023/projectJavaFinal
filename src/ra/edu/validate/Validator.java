@@ -1,5 +1,7 @@
 package ra.edu.validate;
 
+import ra.edu.utils.Color;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Scanner;
@@ -7,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class Validator {
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[\\w.-]+@[\\w.-]+\\.\\w{2,}$");
-    private static final Pattern PHONE_PATTERN = Pattern.compile("^0\\d{9}$");
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^(0|\\+84)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-5]|9[0-9])\\d{7}$");
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
     static {
@@ -18,10 +20,15 @@ public class Validator {
     public static int validateInteger(String message, Scanner sc) {
         while (true) {
             System.out.print(message);
+            String input = sc.nextLine().trim();
+            if (input.isEmpty()) {
+                System.out.println(Color.RED + "Không được để trống. Vui lòng nhập lại." + Color.RESET);
+                continue;
+            }
             try {
-                return Integer.parseInt(sc.nextLine().trim());
+                return Integer.parseInt(input);
             } catch (NumberFormatException e) {
-                System.out.println("\u001B[31mSố nguyên không hợp lệ. Vui lòng thử lại.\u001B[0m");
+                System.out.println(Color.RED + "Số nguyên không hợp lệ. Vui lòng thử lại."+ Color.RESET);
             }
         }
     }
@@ -33,7 +40,7 @@ public class Validator {
             try {
                 return Double.parseDouble(sc.nextLine().trim());
             } catch (NumberFormatException e) {
-                System.out.println("\u001B[31mSố thực không hợp lệ. Vui lòng thử lại.\u001B[0m");
+                System.out.println(Color.RED + "Số thực không hợp lệ. Vui lòng thử lại." + Color.RESET);
             }
         }
     }
@@ -46,7 +53,7 @@ public class Validator {
             if (!input.isEmpty()) {
                 return input;
             }
-            System.out.println("\u001B[31mKhông được để trống. Vui lòng nhập lại.\u001B[0m");
+            System.out.println(Color.RED + "Không được để trống. Vui lòng nhập lại." + Color.RESET);
         }
     }
 
@@ -55,22 +62,33 @@ public class Validator {
         while (true) {
             System.out.print(message);
             String input = sc.nextLine().trim();
+
+            // Kiểm tra nếu email rỗng
+            if (input.isEmpty()) {
+                System.out.println(Color.RED + "Email không được để trống." + Color.RESET);
+                continue; // Quay lại vòng lặp để người dùng nhập lại
+            }
+
+            // Kiểm tra email có đúng định dạng không
             if (EMAIL_PATTERN.matcher(input).matches()) {
                 return input;
             }
-            System.out.println("\u001B[31mEmail không đúng định dạng. Ví dụ: example@gmail.com\u001B[0m");
+
+            System.out.println(Color.RED + "Email không đúng định dạng. Ví dụ: example@gmail.com" + Color.RESET);
         }
     }
+
 
     // Validate số điện thoại Việt Nam
     public static String validatePhone(String message, Scanner sc) {
         while (true) {
             System.out.print(message);
             String input = sc.nextLine().trim();
+
             if (PHONE_PATTERN.matcher(input).matches()) {
                 return input;
             }
-            System.out.println("\u001B[31mSố điện thoại không hợp lệ. Phải có 10 chữ số và bắt đầu bằng số 0.\u001B[0m");
+            System.out.println(Color.RED + "Số điện thoại không hợp lệ. Vui lòng nhập đúng định dạng di động Việt Nam (10 số, bắt đầu bằng các đầu số hợp lệ như 09, 03, 07, 08, 05)." + Color.RESET);
         }
     }
 
@@ -83,7 +101,7 @@ public class Validator {
                 DATE_FORMAT.parse(input);
                 return input;
             } catch (ParseException e) {
-                System.out.println("\u001B[31mNgày không hợp lệ. Định dạng đúng là dd/MM/yyyy.\u001B[0m");
+                System.out.println(Color.RED + "Ngày không hợp lệ. Định dạng đúng là dd/MM/yyyy." + Color.RESET);
             }
         }
     }
@@ -94,13 +112,13 @@ public class Validator {
 
             // Kiểm tra tên người dùng không được rỗng
             if (username.isEmpty()) {
-                System.out.println("\u001B[31mTên người dùng không được để trống. Vui lòng thử lại.\u001B[0m");
+                System.out.println(Color.RED + "Tên người dùng không được để trống. Vui lòng thử lại." + Color.RESET);
                 continue;
             }
 
             // Kiểm tra tên người dùng không chứa ký tự đặc biệt
             if (!Pattern.matches("^[a-zA-Z0-9_]+$", username)) {
-                System.out.println("\u001B[31mTên người dùng chỉ được chứa chữ cái, số và dấu gạch dưới. Vui lòng thử lại.\u001B[0m");
+                System.out.println(Color.RED + "Tên người dùng chỉ được chứa chữ cái, số và dấu gạch dưới. Vui lòng thử lại." + Color.RESET);
                 continue;
             }
 
@@ -113,15 +131,13 @@ public class Validator {
             System.out.print("Nhập mật khẩu: ");
             String password = sc.nextLine().trim();
 
-            // Kiểm tra mật khẩu không được rỗng
             if (password.isEmpty()) {
-                System.out.println("\u001B[31mMật khẩu không được để trống. Vui lòng thử lại.\u001B[0m");
+                System.out.println(Color.RED + "Mật khẩu không được để trống. Vui lòng thử lại." + Color.RESET);
                 continue;
             }
 
-            // Kiểm tra mật khẩu dài ít nhất 6 ký tự
             if (password.length() < 6) {
-                System.out.println("\u001B[31mMật khẩu phải có ít nhất 6 ký tự. Vui lòng thử lại.\u001B[0m");
+                System.out.println(Color.RED + "Mật khẩu phải có ít nhất 6 ký tự. Vui lòng thử lại."+ Color.RESET);
                 continue;
             }
 
