@@ -2,6 +2,7 @@ package ra.edu.business.model.account;
 
 public class Account {
     private  int id;
+    private int student_id;
     private String email;
     private String password;
     private Role role;
@@ -10,12 +11,21 @@ public class Account {
     public Account() {
     }
 
-    public Account(int id, String email, String password, Role role, Status status) {
+    public Account(int id, String email, String password, Role role, Status status, int student_id) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.role = role;
         this.status = status;
+        this.student_id = student_id;
+    }
+
+    public int getStudent_id() {
+        return student_id;
+    }
+
+    public void setStudent_id(int student_id) {
+        this.student_id = student_id;
     }
 
     public int getId() {
@@ -62,6 +72,7 @@ public class Account {
     public String toString() {
         return "Account{" +
                 "id=" + id +
+                ", student_id=" + student_id +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", role=" + role +

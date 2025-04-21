@@ -1,33 +1,33 @@
 package ra.edu.business.model.student;
 
 import ra.edu.business.model.InputTable;
-import ra.edu.business.model.course.Course;
+import ra.edu.validate.student.StudentValidator;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 
 public class Student implements InputTable<Student> {
     private int id;
     private String name;
-    private Date birthday;
+    private LocalDate birthday;
     private String email;
     private boolean status;
     private String phone;
-    private String password;
     private String created_at;
 
     public Student() {
 
     }
 
-    public Student(String name, Date birthday, String email, boolean status, String phone, String password, String created_at) {
+    public Student(String name, LocalDate birthday, String email, boolean status, String phone, String created_at) {
         this.name = name;
         this.birthday = birthday;
         this.email = email;
         this.status = status;
         this.phone = phone;
-        this.password = password;
         this.created_at = created_at;
     }
 
@@ -47,11 +47,11 @@ public class Student implements InputTable<Student> {
         this.name = name;
     }
 
-    public Date getBirthday() {
+    public LocalDate getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(Date birthday) {
+    public void setBirthday(LocalDate birthday) {
         this.birthday = birthday;
     }
 
@@ -79,14 +79,6 @@ public class Student implements InputTable<Student> {
         this.phone = phone;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getCreated_at() {
         return created_at;
     }
@@ -104,14 +96,20 @@ public class Student implements InputTable<Student> {
                 ", email='" + email + '\'' +
                 ", status=" + status +
                 ", phone='" + phone + '\'' +
-                ", password='" + password + '\'' +
                 ", created_at='" + created_at + '\'' +
                 '}';
     }
 
 
     @Override
-    public void inputData(Scanner sc, List<Student> list) {
-
+    public void inputData(Scanner sc, List<Student> studentList) {
+        this.name = StudentValidator.validateName("Nhập họ tên :",sc);
+        this.email = StudentValidator.validateEmail("Nhập email sinh viên: ", sc, studentList);
+        this.birthday = StudentValidator.validateDob("Nhập ngày sinh sinh viên: ", sc);
+        this.phone = StudentValidator.validatePhone("Nhập số điện thoại sinh viên: ", sc);
+        this.status = StudentValidator.validateSex("Nhập giới tính sinh viên (true/false): ", sc);
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        this.created_at = now.format(formatter);
     }
 }

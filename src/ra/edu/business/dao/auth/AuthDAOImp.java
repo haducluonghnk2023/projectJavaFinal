@@ -51,6 +51,7 @@ public class AuthDAOImp implements AuthDAO {
             if (rs.next()) {
                 Account account = new Account();
                 account.setId(rs.getInt("id"));
+                account.setStudent_id(rs.getInt("student_id"));
                 account.setEmail(rs.getString("email"));
                 account.setPassword(password);
                 account.setRole(Role.fromString(rs.getString("role")));

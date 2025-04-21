@@ -97,4 +97,14 @@ public class CourseServiceImp implements CourseService{
 
         return pageInfo;
     }
+
+    @Override
+    public boolean isCourseRegisteredByStudent(int studentId, int courseId) {
+        return courseDAOImp.isCourseRegisteredByStudent(studentId, courseId);
+    }
+
+    @Override
+    public boolean registerCourseForStudent(int studentId, int courseId) {
+        return courseDAOImp.registerCourseForStudent(studentId, courseId);
+    }
 }

@@ -239,4 +239,45 @@ public class CourseDAOImp implements CourseDAO {
         return courses;
     }
 
+    @Override
+    public boolean isCourseRegisteredByStudent(int studentId, int courseId) {
+        String sql = "{CALL CheckCourseRegistration(?, ?)}";
+
+        try (Connection conn = ConnectionDB.openConnection();
+             CallableStatement callSt = conn.prepareCall(sql)) {
+
+            callSt.setInt(1, studentId);
+            callSt.setInt(2, courseId);
+
+            ResultSet rs = callSt.executeQuery();
+
+            return rs.next();
+
+        } catch (SQLException e) {
+            System.err.println(Color.RED + "Lỗi khi kiểm tra đăng ký khóa học: " + e.getMessage() + Color.RESET);
+            return false;
+        }
+    }
+
+
+    @Override
+    public boolean registerCourseForStudent(int studentId, int courseId) {
+        String sql = "{CALL RegisterCourseForStudent(?, ?)}";
+
+        try (Connection conn = ConnectionDB.openConnection();
+             CallableStatement callSt = conn.prepareCall(sql)) {
+
+            callSt.setInt(1, studentId);
+            callSt.setInt(2, courseId);
+
+            int rowsAffected = callSt.executeUpdate();
+
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            System.err.println(Color.RED + "Lỗi khi đăng ký khóa học cho học viên: " + e.getMessage() + Color.RESET);
+            return false;
+        }
+    }
+
 }

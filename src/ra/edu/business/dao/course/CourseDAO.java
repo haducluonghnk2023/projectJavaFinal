@@ -10,4 +10,6 @@ public interface CourseDAO extends AppDAO {
     int getTotalCourses();
     List<Course> searchByName(String keyword);
     List<Course> getSortedPaged(String sortColumn, String sortOrder, int page, int pageSize);
+    boolean isCourseRegisteredByStudent(int studentId, int courseId);
+    boolean registerCourseForStudent(int studentId, int courseId);
 }

@@ -25,6 +25,7 @@ public class AuthUI {
             } else if (account.getStatus() != Status.ACTIVE) {
                 System.out.printf(Color.YELLOW + "Tài khoản đang ở trạng thái [%s]. Vui lòng liên hệ quản trị viên.\n" + Color.RESET, account.getStatus());
             } else {
+                MainApplication.currentUser = account;
                 loggedIn = true;
                 switch (account.getRole()) {
                     case ADMIN:

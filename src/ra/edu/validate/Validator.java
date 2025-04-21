@@ -1,6 +1,7 @@
 package ra.edu.validate;
 
 import ra.edu.utils.Color;
+import ra.edu.validate.student.StudentValidator;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -143,6 +144,35 @@ public class Validator {
 
             return password;
         }
+    }
+
+    public static String validatePassword(String message, Scanner sc) {
+        String password;
+        do {
+            System.out.print(message);
+            password = sc.nextLine();
+            if (password.trim().isEmpty()) {
+                System.out.println(Color.RED + "Mật khẩu không được để trống." + Color.RESET);
+            }
+        } while (password.trim().isEmpty());
+        return password;
+    }
+
+    public static String validateNewPassword(String message, Scanner sc) {
+        String password;
+        boolean isValid;
+        do {
+            System.out.print(message);
+            password = sc.nextLine();
+
+            isValid = StudentValidator.isStrongPassword(password);
+
+            if (!isValid) {
+                System.out.println(Color.RED + "Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt." + Color.RESET);
+            }
+        } while (!isValid);
+
+        return password;
     }
 
 }
