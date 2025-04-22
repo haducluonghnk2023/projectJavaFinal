@@ -2,8 +2,11 @@ package ra.edu.presentation.admin;
 
 import ra.edu.MainApplication;
 import ra.edu.business.model.course.Course;
+import ra.edu.business.model.enrollment.Enrollment;
+import ra.edu.business.model.enrollment.Status;
 import ra.edu.business.model.student.Student;
 import ra.edu.business.service.course.CourseServiceImp;
+import ra.edu.business.service.enrollment.EnrollmentServiceImp;
 import ra.edu.business.service.student.StudentServiceImp;
 import ra.edu.presentation.auth.AuthUI;
 import ra.edu.utils.Color;
@@ -637,7 +640,7 @@ public class AdminUI {
                     updated = true;
                     break;
                 case 5:
-                    updatedStudent.setPhone(StudentValidator.validatePhone("Nhập số điện thoại mới", MainApplication.sc));
+                    updatedStudent.setPhone(StudentValidator.validatePhone("Nhập số điện thoại mới", MainApplication.sc,studentList));
                     updated = true;
                     break;
                 case 6:
@@ -645,7 +648,7 @@ public class AdminUI {
                     updatedStudent.setBirthday(StudentValidator.validateDob("Nhập ngày sinh mới", MainApplication.sc));
                     updatedStudent.setEmail(StudentValidator.validateEmail("Nhập email mới: ", MainApplication.sc, studentList));
                     updatedStudent.setStatus(StudentValidator.validateSex("Nhập giới tính mới", MainApplication.sc));
-                    updatedStudent.setPhone(StudentValidator.validatePhone("Nhập số điện thoại mới", MainApplication.sc));
+                    updatedStudent.setPhone(StudentValidator.validatePhone("Nhập số điện thoại mới", MainApplication.sc,studentList));
                     updated = true;
                     break;
                 case 0:
@@ -834,26 +837,28 @@ public class AdminUI {
     }
 
     public static void displayMenuRegisterCourse() {
+        CourseServiceImp courseServiceImp = new CourseServiceImp();
+        EnrollmentServiceImp enrollmentServiceImp = new EnrollmentServiceImp();
         boolean continueProgram = true;
         do {
             System.out.println(Color.MAGENTA + "=== ADMIN UI ===" + Color.RESET);
             System.out.println(Color.YELLOW + "1. Hiển thị danh sách đăng ký khóa học" + Color.RESET);
             System.out.println(Color.YELLOW + "2. Duyệt sinh viên đăng ký khóa học" + Color.RESET);
             System.out.println(Color.YELLOW + "3. Xóa sinh viên khỏi khóa học" + Color.RESET);
-            System.out.println(Color.RED + "7. Thoát" + Color.RESET);
+            System.out.println(Color.RED + "4. Thoát" + Color.RESET);
             System.out.print("Chọn tùy chọn: ");
             int choice = MainApplication.sc.nextInt();
             MainApplication.sc.nextLine();
 
             switch (choice) {
                 case 1:
-
+                    showStudentsByCoursePaginated(MainApplication.sc, courseServiceImp, enrollmentServiceImp);
                     break;
                 case 2:
-
+                    approveStudentEnrollment(MainApplication.sc, enrollmentServiceImp);
                     break;
                 case 3:
-
+                    rejectStudentEnrollment(MainApplication.sc, enrollmentServiceImp);
                     break;
                 case 4:
                     continueProgram = false;
@@ -863,6 +868,196 @@ public class AdminUI {
             }
         } while (continueProgram);
     }
+
+    public static void showStudentsByCoursePaginated(Scanner sc, CourseServiceImp courseServiceImp, EnrollmentServiceImp enrollmentServiceImp) {
+        System.out.println(Color.MAGENTA + "\n=== DANH SÁCH SINH VIÊN ĐĂNG KÝ THEO KHÓA HỌC ===" + Color.RESET);
+
+        List<Course> courses = courseServiceImp.getAll();
+        if (courses.isEmpty()) {
+            System.out.println(Color.RED + "Không có khóa học nào." + Color.RESET);
+            return;
+        }
+
+        System.out.printf(Color.CYAN + "%-5s | %-30s\n" + Color.RESET, "ID", "Tên khóa học");
+        for (Course c : courses) {
+            System.out.printf("%-5d | %-30s\n", c.getId(), c.getName());
+        }
+
+        int courseId = Validator.validateInteger("Nhập ID khóa học: ", sc);
+        int currentPage = 1;
+        final int pageSize = 5;
+        boolean continuePaging = true;
+
+        try {
+            while (continuePaging) {
+                PageInfo<Enrollment> pageInfo = enrollmentServiceImp.getStudentsByCoursePaginated(courseId, currentPage, pageSize);
+                List<Enrollment> enrollments = pageInfo.getRecords();
+
+                System.out.printf(Color.MAGENTA + "\n--- Trang %d/%d --- Tổng cộng %d sinh viên đăng ký ---\n" + Color.RESET,
+                        pageInfo.getCurrentPage(), pageInfo.getTotalPages(), pageInfo.getTotalRecords());
+
+                if (enrollments.isEmpty()) {
+                    System.out.println(Color.RED + "Không có sinh viên nào ở trang này." + Color.RESET);
+                } else {
+                    System.out.printf(Color.CYAN + "%-10s | %-25s | %-20s | %-15s\n" + Color.RESET,
+                            "Mã SV", "Tên sinh viên", "Ngày đăng ký", "Trạng thái");
+
+                    for (Enrollment e : enrollments) {
+                        System.out.printf("%-10d | %-25s | %-20s | %-15s\n",
+                                e.getStudentId(),
+                                e.getStudentName(),
+                                e.getRegisteredAt().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")),
+                                e.getStatus());
+                    }
+                }
+
+                // Menu điều hướng
+                System.out.println(Color.MAGENTA + "\n== Tùy chọn điều hướng ==" + Color.RESET);
+                System.out.println(Color.YELLOW + "1. Trang tiếp" + Color.RESET);
+                System.out.println(Color.YELLOW + "2. Trang trước" + Color.RESET);
+                System.out.println(Color.YELLOW + "3. Đến trang cụ thể" + Color.RESET);
+                System.out.println(Color.YELLOW + "4. Quay lại menu chính" + Color.RESET);
+                int choice = Validator.validateInteger(Color.MAGENTA + "Lựa chọn: " + Color.RESET, sc);
+
+                switch (choice) {
+                    case 1:
+                        if (currentPage < pageInfo.getTotalPages()) {
+                            currentPage++;
+                        } else {
+                            System.out.println(Color.RED + "Bạn đang ở trang cuối cùng." + Color.RESET);
+                        }
+                        break;
+                    case 2:
+                        if (currentPage > 1) {
+                            currentPage--;
+                        } else {
+                            System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
+                        }
+                        break;
+                    case 3:
+                        System.out.print("Nhập số trang (1 - " + pageInfo.getTotalPages() + "): ");
+                        try {
+                            int targetPage = Integer.parseInt(sc.nextLine());
+                            if (targetPage >= 1 && targetPage <= pageInfo.getTotalPages()) {
+                                currentPage = targetPage;
+                            } else {
+                                System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println(Color.RED + "Vui lòng nhập số nguyên." + Color.RESET);
+                        }
+                        break;
+                    case 4:
+                        continuePaging = false;
+                        System.out.println(Color.YELLOW + "Đã quay lại menu chính." + Color.RESET);
+                        break;
+                    default:
+                        System.out.println(Color.RED + "Lựa chọn không hợp lệ." + Color.RESET);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(Color.RED + "Đã xảy ra lỗi: " + e.getMessage() + Color.RESET);
+            sc.nextLine();
+        }
+    }
+
+    public static void approveStudentEnrollment(Scanner sc, EnrollmentServiceImp enrollmentServiceImp) {
+        System.out.println(Color.MAGENTA + "\n=== DUYỆT SINH VIÊN ĐĂNG KÝ KHÓA HỌC ===" + Color.RESET);
+
+        List<Enrollment> waitingList = enrollmentServiceImp.getEnrollmentsByStatus("waiting");
+
+        if (waitingList.isEmpty()) {
+            System.out.println(Color.RED + "Không có đơn đăng ký nào đang chờ duyệt." + Color.RESET);
+            return;
+        }
+
+        // In thông tin các đơn đăng ký
+        System.out.printf(Color.CYAN + "%-10s | %-25s | %-25s | %-20s | %-15s\n" + Color.RESET,
+                "Enroll ID", "Tên sinh viên", "Tên khóa học", "Ngày đăng ký", "Trạng thái");
+        for (Enrollment e : waitingList) {
+            System.out.printf("%-10d | %-25s | %-25s | %-20s | %-15s\n",
+                    e.getId(),
+                    e.getStudentName(),
+                    e.getCourseName(),
+                    e.getRegisteredAt().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")),
+                    e.getStatus());
+        }
+
+        int enrollmentId = Validator.validateInteger("Nhập ID đăng ký (Enrollment ID) cần duyệt: ", sc);
+
+        // Kiểm tra xem ID có tồn tại trong danh sách không
+        Enrollment enrollmentToApprove = null;
+        for (Enrollment e : waitingList) {
+            if (e.getId() == enrollmentId) {
+                enrollmentToApprove = e;
+                break;
+            }
+        }
+
+        if (enrollmentToApprove == null) {
+            System.out.println(Color.RED + "ID đăng ký không hợp lệ hoặc không tồn tại." + Color.RESET);
+            return;
+        }
+
+        // Duyệt đơn đăng ký
+        boolean success = enrollmentServiceImp.approveEnrollment(enrollmentId);
+
+        if (success) {
+            System.out.println(Color.GREEN + "Duyệt thành công! Trạng thái đã chuyển sang 'confirm'." + Color.RESET);
+        } else {
+            System.out.println(Color.RED + "Duyệt thất bại! Chỉ có thể duyệt các đơn có trạng thái 'waiting'." + Color.RESET);
+        }
+    }
+
+
+    public static void rejectStudentEnrollment(Scanner sc, EnrollmentServiceImp enrollmentServiceImp) {
+        System.out.println(Color.MAGENTA + "\n=== TỪ CHỐI SINH VIÊN ĐĂNG KÝ KHÓA HỌC ===" + Color.RESET);
+
+        List<Enrollment> waitingList = enrollmentServiceImp.getEnrollmentsByStatus("waiting");
+
+        if (waitingList.isEmpty()) {
+            System.out.println(Color.RED + "Không có đơn đăng ký nào đang chờ duyệt." + Color.RESET);
+            return;
+        }
+
+        // In thông tin các đơn đăng ký
+        System.out.printf(Color.CYAN + "%-10s | %-25s | %-25s | %-20s | %-15s\n" + Color.RESET,
+                "Enroll ID", "Tên sinh viên", "Tên khóa học", "Ngày đăng ký", "Trạng thái");
+        for (Enrollment e : waitingList) {
+            System.out.printf("%-10d | %-25s | %-25s | %-20s | %-15s\n",
+                    e.getId(),
+                    e.getStudentName(),
+                    e.getCourseName(),
+                    e.getRegisteredAt().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")),
+                    e.getStatus());
+        }
+
+        int enrollmentId = Validator.validateInteger("Nhập ID đăng ký (Enrollment ID) cần từ chối: ", sc);
+
+        // Kiểm tra xem ID có tồn tại trong danh sách không
+        Enrollment enrollmentToReject = null;
+        for (Enrollment e : waitingList) {
+            if (e.getId() == enrollmentId) {
+                enrollmentToReject = e;
+                break;
+            }
+        }
+
+        if (enrollmentToReject == null) {
+            System.out.println(Color.RED + "ID đăng ký không hợp lệ hoặc không tồn tại." + Color.RESET);
+            return;
+        }
+
+        // Từ chối đơn đăng ký
+        boolean success = enrollmentServiceImp.denyEnrollment(enrollmentId);
+
+        if (success) {
+            System.out.println(Color.GREEN + "Từ chối thành công! Trạng thái đã chuyển sang 'denied'." + Color.RESET);
+        } else {
+            System.out.println(Color.RED + "Từ chối thất bại! Chỉ có thể từ chối các đơn có trạng thái 'waiting'." + Color.RESET);
+        }
+    }
+
 
     public static void displayMenuStatistics() {
         boolean continueProgram = true;

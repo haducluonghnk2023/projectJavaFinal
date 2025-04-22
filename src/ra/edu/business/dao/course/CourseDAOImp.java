@@ -38,7 +38,6 @@ public class CourseDAOImp implements CourseDAO {
         return courses;
     }
 
-
     @Override
     public Object findById(int id) {
         String sql = "{CALL FindCourseById(?)}";
@@ -127,7 +126,6 @@ public class CourseDAOImp implements CourseDAO {
             return false;
         }
     }
-
 
     @Override
     public List<Course> getPageData(int page, int size) {

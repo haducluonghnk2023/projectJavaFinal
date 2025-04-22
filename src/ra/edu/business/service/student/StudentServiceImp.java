@@ -102,4 +102,10 @@ public class StudentServiceImp implements  StudentService {
         return studentDAOImp.changePassword(email,oldPassword,newPassword);
     }
 
+    @Override
+    public Boolean checkOldPassword(String email, String oldPassword) {
+        String result = studentDAOImp.checkOldPassword(email, oldPassword);
+        return "SUCCESS".equals(result);
+    }
+
 }

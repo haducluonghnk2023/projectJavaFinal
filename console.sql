@@ -394,15 +394,26 @@ END
 DELIMITER ;
 -- enrollment
 -- dang ki khoa hoc
+
 DELIMITER //
 
-CREATE PROCEDURE RegisterCourse(IN student_id INT, IN course_id INT)
+CREATE PROCEDURE RegisterCourse(IN IN_student_id INT, IN IN_course_id INT)
 BEGIN
-    INSERT INTO enrollment(student_id, course_id, registered_at)
-    VALUES (student_id, course_id, NOW());
+    IF EXISTS (
+        SELECT 1 FROM enrollment
+        WHERE student_id = IN_student_id AND course_id = IN_course_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Sinh viên đã đăng ký khóa học này.';
+    ELSE
+        INSERT INTO enrollment(student_id, course_id, registered_at)
+        VALUES (IN_student_id, IN_course_id, NOW());
+    END IF;
 END //
 
 DELIMITER ;
+
+
 -- kiem tra da dang ky
 DELIMITER //
 
@@ -420,15 +431,17 @@ END //
 
 DELIMITER ;
 -- lay danh sach khoa hoc da dang ky
+
 DELIMITER //
 
 CREATE PROCEDURE GetCoursesByStudent(IN student_id INT)
 BEGIN
     SELECT * FROM enrollment
-    WHERE student_id = student_id;
+    WHERE student_id = student_id AND status = 'waiting';
 END //
 
 DELIMITER ;
+
 -- kiem tra khoa hoc da dang ky
 DELIMITER //
 CREATE PROCEDURE CheckCourseRegistration(IN student_id INT, IN course_id INT)
@@ -440,20 +453,34 @@ END
 DELIMITER ;
 -- Đăng ký khóa học cho sinh viên
 DELIMITER //
-CREATE PROCEDURE RegisterCourseForStudent(IN student_id_in INT, IN course_id_in INT)
+
+CREATE PROCEDURE RegisterCourseForStudent(
+    IN student_id_in INT,
+    IN course_id_in INT
+)
 BEGIN
-    INSERT INTO enrollment (student_id, course_id, registered_at)
-    VALUES (student_id_in, course_id_in, NOW());
+    IF NOT EXISTS (
+        SELECT 1 FROM enrollment
+        WHERE student_id = student_id_in AND course_id = course_id_in
+    ) THEN
+        INSERT INTO enrollment (student_id, course_id, registered_at)
+        VALUES (student_id_in, course_id_in, NOW());
+    ELSE
+        -- Nếu đã đăng ký thì ném lỗi
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Sinh viên đã đăng ký khóa học này.';
+    END IF;
 END
 //
 DELIMITER ;
+
 -- xem khoa hoc da dang ky
 DELIMITER //
 CREATE PROCEDURE GetCoursesForStudent(IN student_id_in INT)
 BEGIN
     SELECT c.id, c.name, e.registered_at
     FROM enrollment e
-        JOIN course c ON e.course_id = c.id
+             JOIN course c ON e.course_id = c.id
     WHERE e.student_id = student_id_in
     ORDER BY e.registered_at DESC;
 END
@@ -461,26 +488,41 @@ END
 DELIMITER ;
 
 -- huy dang ki
+
 DELIMITER $$
 
-CREATE PROCEDURE CancelEnrollment(IN studentId INT, IN courseId INT)
+CREATE PROCEDURE CancelEnrollment(
+    IN studentId INT,
+    IN courseId INT,
+    OUT isSuccess BOOLEAN
+)
 BEGIN
-    DECLARE currentStatus ENUM('waiting', 'confirmed', 'completed');
+    DECLARE currentStatus ENUM('waiting', 'confirmed', 'completed', 'cancel');
+    SET isSuccess = FALSE;
 
-    SELECT status INTO currentStatus
-    FROM enrollment
-    WHERE student_id = studentId AND course_id = courseId;
+    IF EXISTS (
+        SELECT 1 FROM enrollment
+        WHERE student_id = studentId AND course_id = courseId
+    ) THEN
 
-    IF currentStatus = 'waiting' THEN
-        DELETE FROM enrollment
+        SELECT status INTO currentStatus
+        FROM enrollment
         WHERE student_id = studentId AND course_id = courseId;
-        SELECT 'Hủy đăng ký thành công' AS message;
-    ELSE
-        SELECT 'Không thể hủy đăng ký vì trạng thái không phải là "waiting".' AS message;
+
+        IF currentStatus = 'waiting' THEN
+            UPDATE enrollment
+            SET status = 'cancel'
+            WHERE student_id = studentId AND course_id = courseId;
+
+            SET isSuccess = TRUE;
+        END IF;
+
     END IF;
 END $$
 
 DELIMITER ;
+
+
 --
 DELIMITER //
 
@@ -541,23 +583,76 @@ CREATE PROCEDURE sp_changePassword(
 BEGIN
     DECLARE v_count INT;
 
-    -- Kiểm tra xem email và mật khẩu cũ có đúng không
     SELECT COUNT(*) INTO v_count
     FROM accounts
     WHERE email = p_email AND password = p_old_password;
 
     IF v_count > 0 THEN
-        -- Nếu đúng, cập nhật mật khẩu mới
-        UPDATE accounts
-        SET password = p_new_password
-        WHERE email = p_email;
+        IF p_old_password = p_new_password THEN
+            SET p_status = FALSE;
+        ELSE
+            UPDATE accounts
+            SET password = p_new_password
+            WHERE email = p_email;
 
-        SET p_status = TRUE;
+            SET p_status = TRUE;
+        END IF;
     ELSE
         SET p_status = FALSE;
     END IF;
 END //
 DELIMITER ;
+
+--
+DELIMITER $$
+
+CREATE PROCEDURE CheckOldPassword(IN studentEmail VARCHAR(255), IN oldPassword VARCHAR(255))
+BEGIN
+    DECLARE dbPassword VARCHAR(255);
+
+    SELECT password INTO dbPassword
+    FROM accounts
+    WHERE email = studentEmail;
+
+    IF dbPassword = oldPassword THEN
+        SELECT 'SUCCESS' AS result;
+    ELSE
+        SELECT 'FAIL' AS result;
+    END IF;
+END $$
+
+DELIMITER ;
+
+-- ADMIN ( QUAN LI DANG KY KHOA HOC )
+-- lay danh sach dang ky
+DELIMITER //
+
+CREATE PROCEDURE get_students_by_course_paginated(
+    IN p_course_id INT,
+    IN p_page INT,
+    IN p_page_size INT
+)
+BEGIN
+    DECLARE offset_val INT;
+    SET offset_val = (p_page - 1) * p_page_size;
+
+    SELECT
+        s.id AS student_id,
+        s.name AS student_name,
+        s.email AS student_email,
+        e.registered_at,
+        e.status
+    FROM enrollment e
+             JOIN student s ON e.student_id = s.id
+    WHERE e.course_id = p_course_id
+    ORDER BY e.registered_at DESC
+    LIMIT p_page_size OFFSET offset_val;
+END //
+
+DELIMITER ;
+
+
+
 
 
 

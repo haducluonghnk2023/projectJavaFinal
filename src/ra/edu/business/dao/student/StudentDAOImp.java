@@ -282,7 +282,28 @@ public class StudentDAOImp implements StudentDAO{
                 }
             }
         }
+    }
 
+
+    @Override
+    public String checkOldPassword(String email, String oldPassword) {
+        String result = null;
+        String sql = "{CALL CheckOldPassword(?, ?)}";
+
+        try (Connection conn = ConnectionDB.openConnection();
+             CallableStatement stmt = conn.prepareCall(sql)) {
+
+            stmt.setString(1, email);
+            stmt.setString(2, oldPassword);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                result = rs.getString("result");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
 }

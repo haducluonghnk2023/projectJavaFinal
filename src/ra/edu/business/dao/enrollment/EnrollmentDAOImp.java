@@ -3,12 +3,11 @@ package ra.edu.business.dao.enrollment;
 import ra.edu.business.config.ConnectionDB;
 import ra.edu.business.model.enrollment.Enrollment;
 import ra.edu.business.model.enrollment.Status;
+import ra.edu.exception.login.AppException;
 import ra.edu.utils.Color;
+import ra.edu.utils.PageInfo;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,13 +22,18 @@ public class EnrollmentDAOImp implements  EnrollmentDAO {
             callSt.setInt(1, registration.getStudentId());
             callSt.setInt(2, registration.getCourseId());
 
-            int rowsAffected = callSt.executeUpdate();
-            return rowsAffected > 0;
+            callSt.execute();
+
+            System.out.println(Color.GREEN + "Đăng ký khóa học thành công!" + Color.RESET);
+            return true;
 
         } catch (SQLException e) {
-            System.err.println("Lỗi khi đăng ký khóa học: " + e.getMessage());
+            if ("45000".equals(e.getSQLState())) {
+                System.out.println(Color.RED + "Lỗi đăng ký: " + e.getMessage() + Color.RESET);
+            } else {
+                System.out.println(Color.RED + "Lỗi SQL: " + e.getMessage() + Color.RESET);
+            }
         }
-
         return false;
     }
 
@@ -79,30 +83,36 @@ public class EnrollmentDAOImp implements  EnrollmentDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println("Lỗi khi lấy danh sách khóa học đã đăng ký: " + e.getMessage());
+            throw new AppException("Lỗi khi lấy danh sách khóa học đã đăng ký cho sinh viên có ID = " + studentId, e);
         }
 
         return enrollments;
     }
 
+
     @Override
     public boolean cancelEnrollment(int studentId, int courseId) {
-        String sql = "{CALL CancelEnrollment(?, ?)}";
+        String sql = "{CALL CancelEnrollment(?, ?, ?)}";
 
         try (Connection conn = ConnectionDB.openConnection();
              CallableStatement callSt = conn.prepareCall(sql)) {
 
             callSt.setInt(1, studentId);
             callSt.setInt(2, courseId);
+            callSt.registerOutParameter(3, Types.BOOLEAN);
 
-            callSt.executeUpdate();
+            callSt.execute();
 
-            return true;
+            return callSt.getBoolean(3);
+
         } catch (SQLException e) {
             System.err.println("Lỗi khi hủy đăng ký khóa học: " + e.getMessage());
-            return false;
         }
+
+        return false;
     }
+
+
 
     @Override
     public Enrollment getEnrollmentByStudentAndCourse(int studentId, int courseId) {
@@ -186,6 +196,147 @@ public class EnrollmentDAOImp implements  EnrollmentDAO {
 
         return total;
     }
+
+    @Override
+    public PageInfo<Enrollment> getStudentsByCoursePaginated(int courseId, int page, int pageSize) {
+        List<Enrollment> enrollments = new ArrayList<>();
+        String sql = "{CALL get_students_by_course_paginated(?, ?, ?)}"; // Gọi procedure lấy danh sách sinh viên
+        int totalRecords = 0;
+
+        try (Connection conn = ConnectionDB.openConnection();
+             CallableStatement callSt = conn.prepareCall(sql)) {
+
+            callSt.setInt(1, courseId);
+            callSt.setInt(2, page);
+            callSt.setInt(3, pageSize);
+
+            // Thực thi truy vấn lấy danh sách sinh viên
+            ResultSet rs = callSt.executeQuery();
+            while (rs.next()) {
+                Enrollment e = new Enrollment();
+                e.setStudentId(rs.getInt("student_id"));
+                e.setCourseId(courseId);
+                e.setCourseName(rs.getString("course_name"));
+                e.setRegisteredAt(rs.getTimestamp("registered_at").toLocalDateTime());
+                e.setStatus(Status.valueOf(rs.getString("status").toUpperCase()));
+                e.setStudentName(rs.getString("student_name"));
+
+                enrollments.add(e);
+            }
+
+            // Gọi stored procedure để lấy tổng số bản ghi
+            String countSql = "{CALL get_enrollment_count_by_course(?, ?)}"; // Gọi procedure lấy tổng số bản ghi
+            try (CallableStatement countStmt = conn.prepareCall(countSql)) {
+                countStmt.setInt(1, courseId);
+                countStmt.registerOutParameter(2, Types.INTEGER); // Đăng ký tham số OUT
+
+                countStmt.execute();
+                totalRecords = countStmt.getInt(2); // Lấy kết quả từ tham số OUT
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Tính toán tổng số trang
+        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+
+        // Tạo và trả về PageInfo
+        PageInfo<Enrollment> pageInfo = new PageInfo<>();
+        pageInfo.setRecords(enrollments);
+        pageInfo.setTotalRecords(totalRecords);
+        pageInfo.setTotalPages(totalPages);
+        pageInfo.setCurrentPage(page);
+
+        return pageInfo;
+    }
+
+    @Override
+    public boolean updateEnrollmentStatus(int enrollmentId, String status) {
+        String sql = "{CALL UpdateEnrollmentStatus(?, ?)}";
+
+        try (Connection conn = ConnectionDB.openConnection();
+             CallableStatement callSt = conn.prepareCall(sql)) {
+
+            // Thiết lập tham số cho stored procedure
+            callSt.setInt(1, enrollmentId);
+            callSt.setString(2, status);
+
+            // Thực thi stored procedure
+            int rowsAffected = callSt.executeUpdate();
+
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            throw new AppException("Lỗi khi cập nhật trạng thái đăng ký sinh viên", e);
+        }
+    }
+
+    @Override
+    public boolean approveEnrollment(int enrollmentId) {
+        String sql = "{CALL UpdateEnrollmentStatus(?, ?)}";
+
+        try (Connection conn = ConnectionDB.openConnection();
+             CallableStatement callSt = conn.prepareCall(sql)) {
+
+            callSt.setInt(1, enrollmentId);
+            callSt.setString(2, "confirm");
+
+            int rowsAffected = callSt.executeUpdate();
+
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            throw new AppException("Lỗi khi duyệt đơn đăng ký khóa học", e);
+        }
+    }
+
+    @Override
+    public List<Enrollment> getEnrollmentsByStatus(String status) {
+        List<Enrollment> result = new ArrayList<>();
+
+        String sql = "{CALL GetEnrollmentsByStatus(?)}";
+
+        try (Connection conn = ConnectionDB.openConnection();
+             CallableStatement cs = conn.prepareCall(sql)) {
+
+            cs.setString(1, status);
+            ResultSet rs = cs.executeQuery();
+
+            while (rs.next()) {
+                Enrollment e = new Enrollment();
+                e.setId(rs.getInt("id"));
+                e.setStudentId(rs.getInt("student_id"));
+                e.setStudentName(rs.getString("student_name"));
+                e.setCourseName(rs.getString("course_name"));
+                e.setRegisteredAt(rs.getTimestamp("registered_at").toLocalDateTime());
+                e.setStatus(Status.valueOf(rs.getString("status").toUpperCase()));
+                result.add(e);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    @Override
+    public boolean denyEnrollment(int enrollmentId) {
+        String sql = "{CALL UpdateEnrollmentStatus(?, ?)}";
+
+        try (Connection conn = ConnectionDB.openConnection();
+             CallableStatement callSt = conn.prepareCall(sql)) {
+
+            callSt.setInt(1, enrollmentId);
+            callSt.setString(2, "denied");
+
+            int rowsAffected = callSt.executeUpdate();
+
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            throw new AppException("Lỗi khi xóa sinh viên đăng ký khóa học", e);
+        }
+    }
+
 
     @Override
     public List<Enrollment> findAll() {

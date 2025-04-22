@@ -1,6 +1,6 @@
 package ra.edu.business.config;
 
-import ra.edu.utils.Color;
+import ra.edu.exception.login.AppException;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -13,31 +13,30 @@ public class ConnectionDB {
     private static final String PASSWORD = "new_password";
 
     public static Connection openConnection() {
-        Connection connection = null;
         try {
-            connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            return DriverManager.getConnection(URL, USER, PASSWORD);
         } catch (SQLException e) {
-            System.out.println(Color.RED + "Lỗi kết nối đến cơ sở dữ liệu do: " + e.getMessage() + Color.RESET);
+            throw new AppException("Lỗi kết nối đến cơ sở dữ liệu.", e);
+        } catch (Exception e) {
+            throw new AppException("Lỗi không xác định khi kết nối CSDL.", e);
         }
-        catch (Exception e) {
-            System.out.println(Color.RED + "Có lỗi không xác định khi kết nối CSDL" + e.getMessage() + Color.RESET);
-        }
-        return connection;
     }
+
     public static void closeConnection(Connection connection, CallableStatement callableStatement) {
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                System.out.println(Color.RED + "Lỗi đóng kết nối đến cơ sở dữ liệu do: " + e.getMessage()  + Color.RESET);
-            }
-        }
-        if (callableStatement != null) {
-            try {
+        try {
+            if (callableStatement != null) {
                 callableStatement.close();
-            } catch (SQLException e) {
-                System.out.println(Color.RED + "Lỗi đóng CallableStatement do: " + e.getMessage() + Color.RESET);
             }
+        } catch (SQLException e) {
+            throw new AppException("Lỗi khi đóng CallableStatement.", e);
+        }
+
+        try {
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            throw new AppException("Lỗi khi đóng kết nối cơ sở dữ liệu.", e);
         }
     }
 }

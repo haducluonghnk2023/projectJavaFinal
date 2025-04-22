@@ -12,4 +12,5 @@ public interface StudentDAO extends AppDAO<Student> {
     List<Student> searchByKeyword(String keyword);
     List<Student> getSortedPaged(String sortColumn, String sortOrder, int page, int pageSize);
     boolean changePassword(String email, String oldPassword, String newPassword);
+    String checkOldPassword(String email, String oldPassword);
 }

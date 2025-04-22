@@ -13,5 +13,8 @@ public interface EnrollmentService {
     boolean cancelEnrollment(int studentId, int courseId);
     Enrollment getEnrollmentByStudentAndCourse(int studentId, int courseId);
     PageInfo<Enrollment> getSortedPagedData(String sortColumn, String sortOrder, int page, int size);
-
+    PageInfo<Enrollment> getStudentsByCoursePaginated(int courseId, int page, int pageSize);
+    boolean approveEnrollment(int enrollmentId);
+    List<Enrollment> getEnrollmentsByStatus(String status);
+    boolean denyEnrollment(int enrollmentId);
 }

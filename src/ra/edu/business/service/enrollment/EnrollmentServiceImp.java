@@ -68,5 +68,24 @@ public class EnrollmentServiceImp implements  EnrollmentService {
         return pageInfo;
     }
 
+    @Override
+    public PageInfo<Enrollment> getStudentsByCoursePaginated(int courseId, int page, int pageSize) {
+        return enrollmentDAOImp.getStudentsByCoursePaginated(courseId, page, pageSize);
+    }
+
+    @Override
+    public boolean approveEnrollment(int enrollmentId) {
+        return enrollmentDAOImp.approveEnrollment(enrollmentId);
+    }
+
+    @Override
+    public List<Enrollment> getEnrollmentsByStatus(String status) {
+        return enrollmentDAOImp.getEnrollmentsByStatus(status);
+    }
+
+    @Override
+    public boolean denyEnrollment(int enrollmentId) {
+        return enrollmentDAOImp.denyEnrollment(enrollmentId);
+    }
 
 }

@@ -10,4 +10,5 @@ public interface StudentService extends AppService<Student> {
     PageInfo<Student> searchByKeyword(String keyword, int page, int size);
     PageInfo<Student> getSortedPagedData(String sortColumn, String sortOrder, int page, int size);
     boolean changePassword(String email, String oldPassword, String newPassword);
+    Boolean checkOldPassword(String email, String oldPassword);
 }

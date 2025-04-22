@@ -119,18 +119,34 @@ public class StudentValidator {
         }
     }
 
-    public static String validatePhone(String message, Scanner sc) {
+    public static String validatePhone(String message, Scanner sc, List<Student> studentList) {
         while (true) {
             System.out.print(message + " (bỏ trống nếu không có): ");
             String phone = sc.nextLine().trim();
+
             if (phone.isEmpty()) {
                 return null;
-            } else if (!PHONE_PATTERN.matcher(phone).matches()) {
+            }
+
+            if (!PHONE_PATTERN.matcher(phone).matches()) {
                 System.out.println("Số điện thoại không hợp lệ.");
-            } else {
+            }
+            else if (isPhoneNumberExists(phone, studentList)) {
+                System.out.println("Số điện thoại này đã tồn tại trong hệ thống. Vui lòng nhập số khác.");
+            }
+            else {
                 return phone;
             }
         }
+    }
+
+    public static boolean isPhoneNumberExists(String phone, List<Student> studentList) {
+        for (Student student : studentList) {
+            if (phone.equals(student.getPhone())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static String validatePassword(String message, Scanner sc) {

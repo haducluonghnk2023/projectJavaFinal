@@ -14,7 +14,9 @@ import ra.edu.utils.Color;
 import ra.edu.utils.PageInfo;
 import ra.edu.validate.Validator;
 import ra.edu.validate.course.CourseValidator;
+import ra.edu.validate.student.StudentValidator;
 
+import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +33,7 @@ public class StudentUI {
             System.out.println(Color.YELLOW + "2. Tìm kiếm khóa học theo tên" + Color.RESET);
             System.out.println(Color.YELLOW + "3. Đăng ký khóa học" + Color.RESET);
             System.out.println(Color.YELLOW + "4. Xem khóa học đã đăng ký" + Color.RESET);
-            System.out.println(Color.YELLOW + "5. Sắp xếp khóa học theo tên/ ngày đăng kí - tăng dần / giảm dần " + Color.RESET);
+            System.out.println(Color.YELLOW + "5. Sắp xếp khóa học theo tên/ ngày đăng ký - tăng dần / giảm dần " + Color.RESET);
             System.out.println(Color.YELLOW + "6. Hủy đăng ký khóa học" + Color.RESET);
             System.out.println(Color.YELLOW + "7. Đổi mật khẩu tài khoản" + Color.RESET);
             System.out.println(Color.RED + "8. Đăng xuất" + Color.RESET);
@@ -226,7 +228,6 @@ public class StudentUI {
         StudentServiceImp studentServiceImp = new StudentServiceImp();
         System.out.println(Color.MAGENTA + "\n=== ĐĂNG KÝ KHÓA HỌC ===" + Color.RESET);
 
-        // Hiển thị danh sách các khóa học hiện có
         List<Course> allCourses = courseServiceImp.getAll();
         if (allCourses.isEmpty()) {
             System.out.println(Color.RED + "Hiện không có khóa học nào để đăng ký." + Color.RESET);
@@ -245,7 +246,7 @@ public class StudentUI {
         // Nhập ID khóa học muốn đăng ký
         int courseId = Validator.validateInteger(Color.WHITE + "Nhập ID khóa học bạn muốn đăng ký: " + Color.RESET, sc);
 
-        Course selectedCourse =(Course) courseServiceImp.getById(courseId);
+        Course selectedCourse = (Course) courseServiceImp.getById(courseId);
         if (selectedCourse == null) {
             System.out.println(Color.RED + "Không tìm thấy khóa học với ID đã nhập." + Color.RESET);
             return;
@@ -253,7 +254,6 @@ public class StudentUI {
 
         Account account = MainApplication.currentUser;
         Student student = studentServiceImp.getById(account.getStudent_id());
-        System.out.println("Student: " + student);
         if (student == null) {
             System.out.println("Không tìm thấy thông tin học viên tương ứng với tài khoản này.");
             return;
@@ -263,8 +263,6 @@ public class StudentUI {
         boolean success = courseServiceImp.registerCourseForStudent(studentId, courseId);
         if (success) {
             System.out.println(Color.GREEN + "Đăng ký khóa học thành công!" + Color.RESET);
-        } else {
-            System.out.println(Color.RED + "Bạn đã đăng ký khóa học này hoặc có lỗi xảy ra." + Color.RESET);
         }
     }
 
@@ -360,32 +358,17 @@ public class StudentUI {
     }
 
     public static void cancelCourseRegistration(Scanner sc, EnrollmentServiceImp enrollmentServiceImp, CourseServiceImp courseServiceImp) {
-        StudentServiceImp studentServiceImp = new StudentServiceImp();
         System.out.println(Color.MAGENTA + "\n=== HỦY ĐĂNG KÝ KHÓA HỌC ===" + Color.RESET);
 
-        // Hiển thị danh sách các khóa học học viên đang đăng ký với trạng thái 'waiting' từ bảng Enrollment
-        Account account = MainApplication.currentUser;
-        Student student = studentServiceImp.getById(account.getStudent_id());
+        int studentId = MainApplication.currentUser.getStudent_id();
+        Student student = new StudentServiceImp().getById(studentId);
 
         if (student == null) {
-            System.out.println("Không tìm thấy thông tin học viên tương ứng với tài khoản này.");
+            System.out.println("Không tìm thấy thông tin học viên.");
             return;
         }
-        int studentId = student.getId();
 
-        // Lấy danh sách đăng ký của học viên từ bảng Enrollment
-        List<Enrollment> enrollments = enrollmentServiceImp.getCoursesByStudent(studentId);
-        List<Enrollment> waitingEnrollments = new ArrayList<>();
-
-        // Kiểm tra các đăng ký có trạng thái 'waiting' trong bảng Enrollment
-        for (Enrollment enrollment : enrollments) {
-            if (enrollment.getStatus() == Status.WAITING) {
-                Course course =(Course) courseServiceImp.getById(enrollment.getCourseId());
-                if (course != null) {
-                    waitingEnrollments.add(enrollment);
-                }
-            }
-        }
+        List<Enrollment> waitingEnrollments = enrollmentServiceImp.getCoursesByStudent(studentId);
 
         if (waitingEnrollments.isEmpty()) {
             System.out.println(Color.RED + "Không có khóa học nào đang chờ xác nhận để hủy." + Color.RESET);
@@ -396,27 +379,23 @@ public class StudentUI {
                 "ID", "Tên khóa học", "Số buổi", "Giảng viên");
         System.out.println(Color.YELLOW + "------------------------------------------------------------" + Color.RESET);
 
-        // Hiển thị các khóa học có trạng thái 'waiting' để học viên có thể hủy đăng ký
-        for (Enrollment enrollment : waitingEnrollments) {
-            Course course =(Course) courseServiceImp.getById(enrollment.getCourseId());
-            if (course != null) {
+        waitingEnrollments.forEach(e -> {
+            Course c = (Course) courseServiceImp.getById(e.getCourseId());
+            if (c != null) {
                 System.out.printf(Color.WHITE + "%-5d | %-30s | %-10d | %-25s\n" + Color.RESET,
-                        course.getId(), course.getName(), course.getDuration(), course.getInstructor());
+                        c.getId(), c.getName(), c.getDuration(), c.getInstructor());
             }
-        }
+        });
 
-        // Nhập ID khóa học muốn hủy đăng ký
         int courseId = Validator.validateInteger(Color.WHITE + "Nhập ID khóa học bạn muốn hủy đăng ký: " + Color.RESET, sc);
 
-        Enrollment selectedEnrollment = enrollmentServiceImp.getEnrollmentByStudentAndCourse(studentId, courseId);
-        if (selectedEnrollment == null || selectedEnrollment.getStatus() != Status.WAITING) {
-            System.out.println(Color.RED + "Không tìm thấy đăng ký với khóa học này hoặc khóa học không có trạng thái 'waiting'." + Color.RESET);
+        Enrollment selected = enrollmentServiceImp.getEnrollmentByStudentAndCourse(studentId, courseId);
+        if (selected == null) {
+            System.out.println(Color.RED + "Không tìm thấy đăng ký phù hợp với mã khóa học này." + Color.RESET);
             return;
         }
 
-        // Hủy đăng ký khóa học
-        boolean success = enrollmentServiceImp.cancelEnrollment(studentId, courseId);
-        if (success) {
+        if (enrollmentServiceImp.cancelEnrollment(studentId, courseId)) {
             System.out.println(Color.GREEN + "Hủy đăng ký khóa học thành công!" + Color.RESET);
         } else {
             System.out.println(Color.RED + "Có lỗi xảy ra khi hủy đăng ký khóa học." + Color.RESET);
@@ -510,29 +489,52 @@ public class StudentUI {
         System.out.println(Color.MAGENTA + "\n=== ĐỔI MẬT KHẨU ===" + Color.RESET);
 
         Account currentAccount = MainApplication.currentUser;
-        if (currentAccount == null) {
-            System.out.println(Color.RED + "Bạn chưa đăng nhập." + Color.RESET);
-            return;
-        }
-
         String email = currentAccount.getEmail();
 
-        // Nhập mật khẩu cũ
-        String oldPassword = Validator.validatePassword(Color.WHITE + "Nhập mật khẩu cũ: " + Color.RESET, sc);
-
-        // Nhập mật khẩu mới
-        String newPassword = Validator.validateNewPassword(Color.WHITE + "Nhập mật khẩu mới: " + Color.RESET, sc);
-
-        // Xác nhận mật khẩu mới
-        String confirmPassword = Validator.validatePassword(Color.WHITE + "Xác nhận mật khẩu mới: " + Color.RESET, sc);
-
-        // Kiểm tra xác nhận mật khẩu
-        if (!newPassword.equals(confirmPassword)) {
-            System.out.println(Color.RED + "Xác nhận mật khẩu không khớp với mật khẩu mới." + Color.RESET);
-            return;
+        // Kiểm tra mật khẩu cũ cho đến khi đúng
+        String oldPassword;
+        while (true) {
+            oldPassword = Validator.validatePassword(Color.WHITE + "Nhập mật khẩu cũ: " + Color.RESET, sc);
+            if (studentServiceImp.checkOldPassword(email, oldPassword)) {
+                break;  // Nếu mật khẩu cũ đúng, thoát vòng lặp
+            } else {
+                System.out.println(Color.RED + "Mật khẩu cũ không đúng. Vui lòng thử lại." + Color.RESET);
+            }
         }
 
-        // Thực hiện đổi mật khẩu
+        String newPassword;
+        // Kiểm tra mật khẩu mới cho đến khi hợp lệ
+        while (true) {
+            newPassword = Validator.validateNewPassword(Color.WHITE + "Nhập mật khẩu mới: " + Color.RESET, sc);
+
+            // Kiểm tra mật khẩu mới không được trùng với mật khẩu cũ
+            if (oldPassword.equals(newPassword)) {
+                System.out.println(Color.RED + "Mật khẩu mới không được trùng với mật khẩu cũ. Vui lòng chọn mật khẩu khác." + Color.RESET);
+                continue;  // Yêu cầu nhập lại mật khẩu mới
+            }
+
+            // Kiểm tra độ mạnh của mật khẩu mới
+            if (!StudentValidator.isStrongPassword(newPassword)) {
+                System.out.println(Color.RED + "Mật khẩu mới không đủ mạnh. Vui lòng chọn mật khẩu có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, và số." + Color.RESET);
+                continue;  // Yêu cầu nhập lại mật khẩu mới
+            }
+
+            // Nếu mật khẩu mới hợp lệ, thoát khỏi vòng lặp
+            break;
+        }
+
+        // Xác nhận mật khẩu mới
+        String confirmPassword;
+        while (true) {
+            confirmPassword = Validator.validatePassword(Color.WHITE + "Xác nhận mật khẩu mới: " + Color.RESET, sc);
+            if (newPassword.equals(confirmPassword)) {
+                break;  // Nếu mật khẩu xác nhận khớp, thoát vòng lặp
+            } else {
+                System.out.println(Color.RED + "Xác nhận mật khẩu không khớp với mật khẩu mới. Vui lòng nhập lại." + Color.RESET);
+            }
+        }
+
+        // Thực hiện thay đổi mật khẩu
         boolean success = studentServiceImp.changePassword(email, oldPassword, newPassword);
         if (success) {
             System.out.println(Color.GREEN + "Đổi mật khẩu thành công!" + Color.RESET);

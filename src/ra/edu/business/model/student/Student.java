@@ -106,7 +106,7 @@ public class Student implements InputTable<Student> {
         this.name = StudentValidator.validateName("Nhập họ tên :",sc);
         this.email = StudentValidator.validateEmail("Nhập email sinh viên: ", sc, studentList);
         this.birthday = StudentValidator.validateDob("Nhập ngày sinh sinh viên: ", sc);
-        this.phone = StudentValidator.validatePhone("Nhập số điện thoại sinh viên: ", sc);
+        this.phone = StudentValidator.validatePhone("Nhập số điện thoại sinh viên: ", sc,studentList);
         this.status = StudentValidator.validateSex("Nhập giới tính sinh viên (true/false): ", sc);
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");

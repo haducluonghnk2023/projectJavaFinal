@@ -14,4 +14,9 @@ public interface EnrollmentDAO extends AppDAO<Enrollment> {
     Enrollment getEnrollmentByStudentAndCourse(int studentId, int courseId);
     List<Enrollment> getSortedPaged(String sortColumn, String sortOrder, int page, int pageSize);
     int getTotalEnrollment();
+    PageInfo<Enrollment> getStudentsByCoursePaginated(int courseId, int page, int pageSize);
+    boolean updateEnrollmentStatus(int enrollmentId, String status);
+    boolean approveEnrollment(int enrollmentId);
+    List<Enrollment> getEnrollmentsByStatus(String status);
+    boolean denyEnrollment(int enrollmentId);
 }

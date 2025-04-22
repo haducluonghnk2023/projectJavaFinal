@@ -9,19 +9,29 @@ public class Enrollment {
     private LocalDateTime registeredAt;
     private Status status;
     private String courseName;
+    private String studentName;
 
     public Enrollment() {
         this.status = Status.WAITING;
         this.registeredAt = LocalDateTime.now();
     }
 
-    public Enrollment(int id, int studentId, int courseId, LocalDateTime registeredAt, Status status, String courseName) {
+    public Enrollment(int id, int studentId, int courseId, LocalDateTime registeredAt, Status status, String courseName, String studentName) {
         this.id = id;
         this.studentId = studentId;
         this.courseId = courseId;
         this.registeredAt = registeredAt;
         this.status = status;
         this.courseName = courseName;
+        this.studentName = studentName;
+    }
+
+    public String getStudentName() {
+        return studentName;
+    }
+
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
     }
 
     public int getId() {
