@@ -35,6 +35,30 @@ public class CourseValidator {
         }
     }
 
+    public static String validateCourseNameUpdate(Scanner sc, List<Course> courseList, String currentName) {
+        while (true) {
+            String rawName = Validator.validateNonEmptyString("Nhập tên khóa học: ", sc);
+            String name = normalizeName(rawName);
+
+            if (name.length() > 100) {
+                System.out.println(Color.RED + "Tên khóa học không được vượt quá 100 ký tự." + Color.RESET);
+                continue;
+            }
+
+            boolean isDuplicate = courseList.stream()
+                    .anyMatch(course -> !normalizeName(course.getName()).equalsIgnoreCase(normalizeName(currentName)) &&
+                            normalizeName(course.getName()).equalsIgnoreCase(name));
+
+            if (isDuplicate) {
+                System.out.println(Color.RED + "Tên khóa học đã tồn tại. Vui lòng nhập tên khác." + Color.RESET);
+                continue;
+            }
+
+            return name;
+        }
+    }
+
+
     private static String normalizeName(String name) {
         return name.trim().replaceAll("\\s+", " ");
     }

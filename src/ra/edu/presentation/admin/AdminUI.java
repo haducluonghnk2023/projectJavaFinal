@@ -23,20 +23,27 @@ public class AdminUI {
     public static void displayMenuAdmin() {
         boolean continueProgram = true;
         do {
-            System.out.println(Color.CYAN + "=== ADMIN UI ===" + Color.RESET);
-            System.out.println(Color.YELLOW + "1. Quản lý khóa học" + Color.RESET);
-            System.out.println(Color.YELLOW + "2. Quản lý sinh viên" + Color.RESET);
-            System.out.println(Color.YELLOW + "3. Quản lý đăng ký khóa học" + Color.RESET);
-            System.out.println(Color.YELLOW + "4. Thống kê" + Color.RESET);
-            System.out.println(Color.RED + "5. Đăng xuất" + Color.RESET);
-            int choice = Validator.validateInteger(Color.MAGENTA + "Chọn tùy chọn: " + Color.RESET,MainApplication.sc);
+            System.out.println(Color.CYAN + "============================= ADMIN UI ==============================" + Color.RESET);
+            System.out.println(Color.CYAN + "╔════════════╦══════════════════════════════════════════════════════╗");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "Lựa chọn", "Mô tả");
+            System.out.println("╠════════════╬══════════════════════════════════════════════════════╣");
+
+            System.out.printf("║ %-10s ║ %-52s ║\n", "1", "Quản lý khóa học");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "2", "Quản lý sinh viên");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "3", "Quản lý đăng ký khóa học");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "4", "Thống kê");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "5", "Đăng xuất");
+
+            System.out.println("╚════════════╩══════════════════════════════════════════════════════╝" + Color.RESET);
+
+            int choice = Validator.validateInteger(Color.MAGENTA + "Chọn tùy chọn: " + Color.RESET, MainApplication.sc);
 
             switch (choice) {
                 case 1:
                     displayMenuCourse();
                     break;
                 case 2:
-                     displayMenuStudent();
+                    displayMenuStudent();
                     break;
                 case 3:
                     displayMenuRegisterCourse();
@@ -58,14 +65,19 @@ public class AdminUI {
         CourseServiceImp courseServiceImp = new CourseServiceImp();
         boolean continueProgram = true;
         do {
-            System.out.println(Color.CYAN + "=== ADMIN UI ===" + Color.RESET);
-            System.out.println(Color.YELLOW + "1. Hiển thị danh sách khóa học" + Color.RESET);
-            System.out.println(Color.YELLOW + "2. Thêm mới khóa học" + Color.RESET);
-            System.out.println(Color.YELLOW + "3. Chỉnh sửa khóa học" + Color.RESET);
-            System.out.println(Color.YELLOW + "4. Xóa khóa học" + Color.RESET);
-            System.out.println(Color.YELLOW + "5. Tìm kiếm khóa học theo tên" + Color.RESET);
-            System.out.println(Color.YELLOW + "6. Sắp xếp khóa học" + Color.RESET);
-            System.out.println(Color.RED + "7. Thoát" + Color.RESET);
+            System.out.println(Color.CYAN + "============================= ADMIN UI ==============================" + Color.RESET);
+            System.out.println(Color.CYAN + "╔════════════╦══════════════════════════════════════════════════════╗");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "Lựa chọn", "Mô tả");
+            System.out.println("╠════════════╬══════════════════════════════════════════════════════╣");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "1", "Hiển thị danh sách khóa học");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "2", "Thêm mới khóa học");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "3", "Chỉnh sửa khóa học");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "4", "Xóa khóa học");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "5", "Tìm kiếm khóa học theo tên");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "6", "Sắp xếp khóa học");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "7", "Thoát");
+            System.out.println("╚════════════╩══════════════════════════════════════════════════════╝" + Color.RESET);
+
             int choice = Validator.validateInteger(Color.MAGENTA + "Chọn tùy chọn: " + Color.RESET,MainApplication.sc);
 
             switch (choice) {
@@ -106,73 +118,96 @@ public class AdminUI {
             while (continueList) {
                 PageInfo<Course> pageInfo = courseServiceImp.getPageData(currentPage, pageSize);
                 List<Course> courses = pageInfo.getRecords();
+                int totalPages = pageInfo.getTotalPages();
 
-                System.out.println(Color.MAGENTA + "\n--- Danh sách khóa học (Trang " + pageInfo.getCurrentPage() + "/" + pageInfo.getTotalPages() + ") --- Tổng " + pageInfo.getTotalRecords() + " khóa học" + Color.RESET);
+                System.out.println(Color.BLUE + "╔══════════════════════════════════════════════════════════════════════════════════════════════════════════╗" + Color.RESET);
+                System.out.printf(Color.YELLOW + "║ %-104s ║\n" + Color.RESET,
+                        "DANH SÁCH KHÓA HỌC ĐÃ SẮP XẾP - Trang " + pageInfo.getCurrentPage() + "/" + totalPages +
+                                " (Tổng cộng: " + pageInfo.getTotalRecords() + " khóa học)");
+                System.out.println(Color.BLUE + "╠═════╦════════════════════════════════════════════╦══════════╦═══════════════════════════════╦════════════╣" + Color.RESET);
+                System.out.printf(Color.CYAN + "║ %-3s ║ %-42s ║ %-8s ║ %-29s ║ %-10s ║\n" + Color.RESET,
+                        "ID", "Tên khóa học", "Số buổi", "Giảng viên", "Ngày tạo");
+                System.out.println(Color.BLUE + "╠═════╬════════════════════════════════════════════╬══════════╬═══════════════════════════════╬════════════╣" + Color.RESET);
 
+                // Hiển thị danh sách khóa học đã sắp xếp
                 if (courses.isEmpty()) {
-                    System.out.println(Color.RED + "Không có khóa học nào ở trang này." + Color.RESET);
+                    System.out.printf(Color.RED + "║ %-94s ║\n" + Color.RESET, "Không có khóa học nào.");
                 } else {
-                    // Hiển thị bảng với khung
-                    System.out.println(Color.YELLOW + "+-----+--------------------------------+------------+-------------------------+--------------+" + Color.RESET);
-                    System.out.printf(Color.CYAN + "| %-3s | %-30s | %-10s | %-25s | %-12s |\n" + Color.RESET,
-                            "ID", "Tên khóa học", "Số buổi", "Giảng viên", "Ngày tạo");
-                    System.out.println(Color.YELLOW + "+-----+--------------------------------+------------+-------------------------+--------------+" + Color.RESET);
-
                     for (Course course : courses) {
-                        System.out.printf(Color.WHITE + "| %-3d | %-30s | %-10d | %-25s | %-12s |\n" + Color.RESET,
+                        System.out.printf(Color.WHITE + "║ %-3d ║ %-42s ║ %-8d ║ %-29s ║ %-10s ║\n" + Color.RESET,
                                 course.getId(), course.getName(), course.getDuration(),
                                 course.getInstructor(), course.getCreateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
                     }
-
-                    System.out.println(Color.YELLOW + "+-----+--------------------------------+------------+-------------------------+--------------+" + Color.RESET);
                 }
 
-                System.out.println(Color.MAGENTA + "\n== Tùy chọn điều hướng ==" + Color.RESET);
-                System.out.println(Color.YELLOW + "1. Trang tiếp" + Color.RESET);
-                System.out.println(Color.YELLOW + "2. Trang trước" + Color.RESET);
-                System.out.println(Color.YELLOW + "3. Đến trang cụ thể" + Color.RESET);
-                System.out.println(Color.YELLOW + "4. Quay lại menu chính" + Color.RESET);
-                int choiceInput = Validator.validateInteger(Color.MAGENTA + "Lựa chọn: " + Color.RESET, sc);
+                System.out.println(Color.BLUE + "╚═════╩════════════════════════════════════════════╩══════════╩═══════════════════════════════╩════════════╝" + Color.RESET);
 
-                switch (choiceInput) {
-                    case 1:
-                        if (currentPage < pageInfo.getTotalPages()) {
-                            currentPage++;
+                if (totalPages > 1) {
+                    System.out.println(Color.MAGENTA + "\nChọn trang (gõ số trang / 0: quay lại menu chính)" + Color.RESET);
+                    System.out.print(Color.YELLOW + "Trang: " + Color.RESET);
+
+                    for (int i = 1; i <= totalPages; i++) {
+                        if (i == currentPage) {
+                            System.out.print(Color.GREEN + "[" + i + "] " + Color.RESET);
                         } else {
-                            System.out.println(Color.RED + "Bạn đang ở trang cuối cùng." + Color.RESET);
+                            System.out.print(Color.GRAY + i + " " + Color.RESET);
                         }
-                        break;
-                    case 2:
-                        if (currentPage > 1) {
-                            currentPage--;
-                        } else {
-                            System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
-                        }
-                        break;
-                    case 3:
-                        System.out.print(Color.WHITE + "Nhập số trang (1 - " + pageInfo.getTotalPages() + "): " + Color.RESET);
-                        try {
-                            int targetPage = Integer.parseInt(sc.nextLine());
-                            if (targetPage >= 1 && targetPage <= pageInfo.getTotalPages()) {
-                                currentPage = targetPage;
+                    }
+
+                    if (currentPage < totalPages) {
+                        System.out.print(Color.CYAN + " / n: next" + Color.RESET);
+                    }
+                    if (currentPage > 1) {
+                        System.out.print(Color.CYAN + " / p: prev" + Color.RESET);
+                    }
+
+                    String choice = Validator.validateNonEmptyString("\n" + Color.CYAN + "Nhập lựa chọn: " + Color.RESET, sc);
+
+                    switch (choice) {
+                        case "n":
+                            if (currentPage < totalPages) {
+                                currentPage++;
                             } else {
-                                System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                                System.out.println(Color.RED + "Bạn đang ở trang cuối cùng." + Color.RESET);
                             }
-                        } catch (NumberFormatException e) {
-                            System.out.println(Color.RED + "Vui lòng nhập số nguyên." + Color.RESET);
-                        }
-                        break;
-                    case 4:
+                            break;
+                        case "p":
+                            if (currentPage > 1) {
+                                currentPage--;
+                            } else {
+                                System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
+                            }
+                            break;
+                        case "0":
+                            System.out.println(Color.YELLOW + "Quay lại menu chính..." + Color.RESET);
+                            continueList = false;
+                            break;
+                        default:
+                            try {
+                                int page = Integer.parseInt(choice);
+                                if (page >= 1 && page <= totalPages) {
+                                    currentPage = page;
+                                } else {
+                                    System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println(Color.RED + "Lựa chọn không hợp lệ. Nhập số trang hoặc n / p / 0." + Color.RESET);
+                            }
+                            break;
+                    }
+                } else {
+                    System.out.println(Color.MAGENTA + "\nChọn 0 để quay lại menu chính." + Color.RESET);
+                    String choice = sc.nextLine().trim().toLowerCase();
+                    if (choice.equals("0")) {
+                        System.out.println(Color.YELLOW + "Quay lại menu chính..." + Color.RESET);
                         continueList = false;
-                        System.out.println(Color.YELLOW + "Đã quay lại menu chính." + Color.RESET);
-                        break;
-                    default:
+                    } else {
                         System.out.println(Color.RED + "Lựa chọn không hợp lệ." + Color.RESET);
+                    }
                 }
             }
         } catch (Exception e) {
             System.out.println(Color.RED + "Đã xảy ra lỗi: " + e.getMessage() + Color.RESET);
-            sc.nextLine();
         }
     }
 
@@ -207,7 +242,7 @@ public class AdminUI {
 
         System.out.println(Color.MAGENTA + "\n--- Thông tin hiện tại ---" + Color.RESET);
         System.out.println(Color.WHITE + "Tên khóa học: " + existingCourse.getName() + Color.RESET);
-        System.out.println(Color.WHITE + "Thời lượng: " + existingCourse.getDuration() + " giờ" + Color.RESET);
+        System.out.println(Color.WHITE + "Thời lượng: " + existingCourse.getDuration() + " buổi" + Color.RESET);
         System.out.println(Color.WHITE + "Giảng viên: " + existingCourse.getInstructor() + Color.RESET);
 
         // Lấy danh sách khóa học hiện tại từ service
@@ -232,8 +267,7 @@ public class AdminUI {
 
             switch (choice) {
                 case 1:
-                    // Kiểm tra trùng tên khóa học khi cập nhật
-                    updatedCourse.setName(CourseValidator.validateCourseName(MainApplication.sc, courseList));
+                    updatedCourse.setName(CourseValidator.validateCourseNameUpdate(MainApplication.sc, courseList, existingCourse.getName()));
                     updated = true;
                     break;
                 case 2:
@@ -245,8 +279,7 @@ public class AdminUI {
                     updated = true;
                     break;
                 case 4:
-                    // Kiểm tra trùng tên khóa học khi cập nhật tất cả thông tin
-                    updatedCourse.setName(CourseValidator.validateCourseName(MainApplication.sc, courseList));
+                    updatedCourse.setName(CourseValidator.validateCourseNameUpdate(MainApplication.sc, courseList, existingCourse.getName()));
                     updatedCourse.setDuration(CourseValidator.validateDuration(MainApplication.sc));
                     updatedCourse.setInstructor(CourseValidator.validateInstructor(MainApplication.sc));
                     updated = true;
@@ -294,76 +327,101 @@ public class AdminUI {
         String keyword = Validator.validateNonEmptyString(Color.WHITE + "Nhập tên khóa học cần tìm: " + Color.RESET, sc);
 
         int currentPage = 1;
-        int pageSize = 5;
+        int pageSize = CourseValidator.validatePageSize(sc);
         boolean continueSearch = true;
 
         try {
             while (continueSearch) {
                 PageInfo<Course> pageInfo = courseServiceImp.searchByName(keyword, currentPage, pageSize);
                 List<Course> courses = pageInfo.getRecords();
+                int totalPages = pageInfo.getTotalPages();
 
-                System.out.println(Color.MAGENTA + "\n--- Kết quả tìm kiếm (Trang " + pageInfo.getCurrentPage() + "/" + pageInfo.getTotalPages() + ") --- Tổng " + pageInfo.getTotalRecords() + " khóa học" + Color.RESET);
+                System.out.println(Color.BLUE + "╔══════════════════════════════════════════════════════════════════════════════════════════════════════════╗" + Color.RESET);
+                System.out.printf(Color.YELLOW + "║ %-104s ║\n" + Color.RESET,
+                        "KẾT QUẢ TÌM KIẾM - Tên khóa học: " + keyword + " - Trang " + pageInfo.getCurrentPage() + "/" + totalPages +
+                                " (Tổng cộng: " + pageInfo.getTotalRecords() + " khóa học)");
+                System.out.println(Color.BLUE + "╠═════╦════════════════════════════════════════════╦══════════╦═══════════════════════════════╦════════════╣" + Color.RESET);
+                System.out.printf(Color.CYAN + "║ %-3s ║ %-42s ║ %-8s ║ %-29s ║ %-10s ║\n" + Color.RESET,
+                        "ID", "Tên khóa học", "Số buổi", "Giảng viên", "Ngày tạo");
+                System.out.println(Color.BLUE + "╠═════╬════════════════════════════════════════════╬══════════╬═══════════════════════════════╬════════════╣" + Color.RESET);
 
                 if (courses.isEmpty()) {
-                    System.out.println(Color.RED + "Không tìm thấy khóa học nào với tên chứa: " + keyword + Color.RESET);
+                    System.out.printf(Color.RED + "║ %-94s ║\n" + Color.RESET, "Không tìm thấy khóa học nào với tên chứa: " + keyword);
                 } else {
-                    // Hiển thị bảng với khung
-                    System.out.println(Color.YELLOW + "------------------------------------------------------------" + Color.RESET);
-                    System.out.printf(Color.CYAN + "| %-3s | %-30s | %-10s | %-25s | %-12s |\n" + Color.RESET,
-                            "ID", "Tên khóa học", "Số buổi", "Giảng viên", "Ngày tạo");
-                    System.out.println(Color.YELLOW + "------------------------------------------------------------" + Color.RESET);
-
                     for (Course course : courses) {
-                        System.out.printf(Color.WHITE + "| %-3d | %-30s | %-10d | %-25s | %-12s |\n" + Color.RESET,
-                                course.getId(), course.getName(), course.getDuration(),
-                                course.getInstructor(), course.getCreateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                        System.out.printf(Color.WHITE + "║ %-3s ║ %-42s ║ %-8s ║ %-29s ║ %-10s ║\n" + Color.RESET,
+                                course.getId(),
+                                course.getName(),
+                                course.getDuration(),
+                                course.getInstructor(),
+                                course.getCreateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
                     }
-
-                    System.out.println(Color.YELLOW + "------------------------------------------------------------" + Color.RESET);
                 }
 
-                System.out.println(Color.MAGENTA + "\n== Tùy chọn điều hướng ==" + Color.RESET);
-                System.out.println(Color.YELLOW + "1. Trang tiếp" + Color.RESET);
-                System.out.println(Color.YELLOW + "2. Trang trước" + Color.RESET);
-                System.out.println(Color.YELLOW + "3. Đến trang cụ thể" + Color.RESET);
-                System.out.println(Color.YELLOW + "4. Quay lại menu chính" + Color.RESET);
-                System.out.print(Color.MAGENTA + "Lựa chọn: " + Color.RESET);
+                System.out.println(Color.BLUE + "╚═════╩════════════════════════════════════════════╩══════════╩═══════════════════════════════╩════════════╝" + Color.RESET);
 
-                String choiceInput = sc.nextLine();
-                switch (choiceInput) {
-                    case "1":
-                        if (currentPage < pageInfo.getTotalPages()) {
-                            currentPage++;
+                if (totalPages > 1) {
+                    System.out.println(Color.MAGENTA + "\nChọn trang (gõ số trang / n: next / p: prev / 0: quay lại menu chính)" + Color.RESET);
+                    System.out.print(Color.YELLOW + "Trang: " + Color.RESET);
+                    for (int i = 1; i <= totalPages; i++) {
+                        if (i == currentPage) {
+                            System.out.print(Color.GREEN + "[" + i + "] " + Color.RESET);
                         } else {
-                            System.out.println(Color.RED + "Bạn đang ở trang cuối cùng." + Color.RESET);
+                            System.out.print(Color.GRAY + i + " " + Color.RESET);
                         }
-                        break;
-                    case "2":
-                        if (currentPage > 1) {
-                            currentPage--;
-                        } else {
-                            System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
-                        }
-                        break;
-                    case "3":
-                        System.out.print(Color.WHITE + "Nhập số trang (1 - " + pageInfo.getTotalPages() + "): " + Color.RESET);
-                        try {
-                            int targetPage = Integer.parseInt(sc.nextLine());
-                            if (targetPage >= 1 && targetPage <= pageInfo.getTotalPages()) {
-                                currentPage = targetPage;
+                    }
+
+                    if (currentPage < totalPages) {
+                        System.out.print(Color.CYAN + " / n: next" + Color.RESET);
+                    }
+
+                    if (currentPage > 1) {
+                        System.out.print(Color.CYAN + " / p: prev" + Color.RESET);
+                    }
+
+                    String choice = Validator.validateNonEmptyString("\n" + Color.CYAN + "Nhập lựa chọn: " + Color.RESET, sc);
+
+                    switch (choice) {
+                        case "n":
+                            if (currentPage < totalPages) {
+                                currentPage++;
                             } else {
-                                System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                                System.out.println(Color.RED + "Bạn đang ở trang cuối cùng." + Color.RESET);
                             }
-                        } catch (NumberFormatException e) {
-                            System.out.println(Color.RED + "Vui lòng nhập số nguyên." + Color.RESET);
-                        }
-                        break;
-                    case "4":
+                            break;
+                        case "p":
+                            if (currentPage > 1) {
+                                currentPage--;
+                            } else {
+                                System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
+                            }
+                            break;
+                        case "0":
+                            System.out.println(Color.YELLOW + "Quay lại menu chính..." + Color.RESET);
+                            continueSearch = false;
+                            break;
+                        default:
+                            try {
+                                int page = Integer.parseInt(choice);
+                                if (page >= 1 && page <= totalPages) {
+                                    currentPage = page;
+                                } else {
+                                    System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println(Color.RED + "Lựa chọn không hợp lệ. Nhập số trang hoặc n / p / 0." + Color.RESET);
+                            }
+                            break;
+                    }
+                } else {
+                    System.out.println(Color.MAGENTA + "\nChọn 0 để quay lại menu chính." + Color.RESET);
+                    String choice = sc.nextLine().trim().toLowerCase();
+                    if (choice.equals("0")) {
+                        System.out.println(Color.YELLOW + "⬅ Quay lại menu chính..." + Color.RESET);
                         continueSearch = false;
-                        System.out.println(Color.YELLOW + "Đã quay lại menu chính." + Color.RESET);
-                        break;
-                    default:
+                    } else {
                         System.out.println(Color.RED + "Lựa chọn không hợp lệ." + Color.RESET);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -383,72 +441,91 @@ public class AdminUI {
             while (continuePaging) {
                 PageInfo<Course> pageInfo = courseServiceImp.getSortedPagedData(sortColumn, sortOrder, currentPage, pageSize);
                 List<Course> courses = pageInfo.getRecords();
+                int totalPages = pageInfo.getTotalPages();
 
-                System.out.println(Color.MAGENTA + "\n--- Danh sách sắp xếp (Trang " + pageInfo.getCurrentPage() + "/" + pageInfo.getTotalPages() + ") --- Tổng " + pageInfo.getTotalRecords() + " khóa học" + Color.RESET);
+                System.out.println(Color.BLUE + "╔══════════════════════════════════════════════════════════════════════════════════════════════════════════╗" + Color.RESET);
+                System.out.printf(Color.YELLOW + "║ %-104s ║\n" + Color.RESET,
+                        "DANH SÁCH KHÓA HỌC ĐÃ SẮP XẾP - Trang " + pageInfo.getCurrentPage() + "/" + totalPages +
+                                " (Tổng cộng: " + pageInfo.getTotalRecords() + " khóa học)");
+                System.out.println(Color.BLUE + "╠═════╦════════════════════════════════════════════╦══════════╦═══════════════════════════════╦════════════╣" + Color.RESET);
+                System.out.printf(Color.CYAN + "║ %-3s ║ %-42s ║ %-8s ║ %-29s ║ %-10s ║\n" + Color.RESET,
+                        "ID", "Tên khóa học", "Số buổi", "Giảng viên", "Ngày tạo");
+                System.out.println(Color.BLUE + "╠═════╬════════════════════════════════════════════╬══════════╬═══════════════════════════════╬════════════╣" + Color.RESET);
 
                 if (courses.isEmpty()) {
-                    System.out.println(Color.RED + "Không có khóa học nào." + Color.RESET);
+                    System.out.printf(Color.RED + "║ %-94s ║\n" + Color.RESET, "Không có khóa học nào.");
                 } else {
-                    // In ra khung bảng
-                    System.out.println(Color.YELLOW + "+-----+----------------------+------------+-----------------+--------------+");
-                    System.out.printf(Color.CYAN + "| %-3s | %-20s | %-10s | %-15s | %-12s |\n" + Color.RESET,
-                            "ID", "Tên khóa học", "Số buổi", "Giảng viên", "Ngày tạo");
-                    System.out.println(Color.YELLOW + "+-----+----------------------+------------+-----------------+--------------+");
-
-                    // In danh sách khóa học
                     for (Course course : courses) {
-                        System.out.printf(Color.WHITE + "| %-3d | %-20s | %-10d | %-15s | %-12s |\n" + Color.RESET,
+                        System.out.printf(Color.WHITE + "║ %-3d ║ %-42s ║ %-8d ║ %-29s ║ %-10s ║\n" + Color.RESET,
                                 course.getId(), course.getName(), course.getDuration(),
                                 course.getInstructor(), course.getCreateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
                     }
-
-                    // Kết thúc bảng
-                    System.out.println(Color.YELLOW + "+-----+----------------------+------------+-----------------+--------------+" + Color.RESET);
                 }
 
-                // Tùy chọn điều hướng
-                System.out.println(Color.MAGENTA + "\n== Tùy chọn điều hướng ==" + Color.RESET);
-                System.out.println(Color.YELLOW + "1. Trang tiếp" + Color.RESET);
-                System.out.println(Color.YELLOW + "2. Trang trước" + Color.RESET);
-                System.out.println(Color.YELLOW + "3. Đến trang cụ thể" + Color.RESET);
-                System.out.println(Color.YELLOW + "4. Quay lại menu chính" + Color.RESET);
-                System.out.print(Color.MAGENTA + "Lựa chọn: " + Color.RESET);
+                System.out.println(Color.BLUE + "╚═════╩════════════════════════════════════════════╩══════════╩═══════════════════════════════╩════════════╝" + Color.RESET);
 
-                String choice = sc.nextLine();
-                switch (choice) {
-                    case "1":
-                        if (currentPage < pageInfo.getTotalPages()) {
-                            currentPage++;
+                if (totalPages > 1) {
+                    System.out.println(Color.MAGENTA + "\nChọn trang (gõ số trang / 0: quay lại menu chính)" + Color.RESET);
+                    System.out.print(Color.YELLOW + "Trang: " + Color.RESET);
+
+                    for (int i = 1; i <= totalPages; i++) {
+                        if (i == currentPage) {
+                            System.out.print(Color.GREEN + "[" + i + "] " + Color.RESET);
                         } else {
-                            System.out.println(Color.RED + "Bạn đang ở trang cuối cùng." + Color.RESET);
+                            System.out.print(Color.GRAY + i + " " + Color.RESET);
                         }
-                        break;
-                    case "2":
-                        if (currentPage > 1) {
-                            currentPage--;
-                        } else {
-                            System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
-                        }
-                        break;
-                    case "3":
-                        System.out.print(Color.WHITE + "Nhập số trang (1 - " + pageInfo.getTotalPages() + "): " + Color.RESET);
-                        try {
-                            int targetPage = Integer.parseInt(sc.nextLine());
-                            if (targetPage >= 1 && targetPage <= pageInfo.getTotalPages()) {
-                                currentPage = targetPage;
+                    }
+
+                    if (currentPage < totalPages) {
+                        System.out.print(Color.CYAN + " / n: next" + Color.RESET);
+                    }
+                    if (currentPage > 1) {
+                        System.out.print(Color.CYAN + " / p: prev" + Color.RESET);
+                    }
+
+                    String choice = Validator.validateNonEmptyString("\n" + Color.CYAN + "Nhập lựa chọn: " + Color.RESET, sc);
+
+                    switch (choice) {
+                        case "n":
+                            if (currentPage < totalPages) {
+                                currentPage++;
                             } else {
-                                System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                                System.out.println(Color.RED + "⚠ Bạn đang ở trang cuối cùng." + Color.RESET);
                             }
-                        } catch (NumberFormatException e) {
-                            System.out.println(Color.RED + "Vui lòng nhập số nguyên." + Color.RESET);
-                        }
-                        break;
-                    case "4":
+                            break;
+                        case "p":
+                            if (currentPage > 1) {
+                                currentPage--;
+                            } else {
+                                System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
+                            }
+                            break;
+                        case "0":
+                            System.out.println(Color.YELLOW + "Quay lại menu chính..." + Color.RESET);
+                            continuePaging = false;
+                            break;
+                        default:
+                            try {
+                                int page = Integer.parseInt(choice);
+                                if (page >= 1 && page <= totalPages) {
+                                    currentPage = page;
+                                } else {
+                                    System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println(Color.RED + "Lựa chọn không hợp lệ. Nhập số trang hoặc n / p / 0." + Color.RESET);
+                            }
+                            break;
+                    }
+                } else {
+                    System.out.println(Color.MAGENTA + "\nChọn 0 để quay lại menu chính." + Color.RESET);
+                    String choice = sc.nextLine().trim().toLowerCase();
+                    if (choice.equals("0")) {
+                        System.out.println(Color.YELLOW + "Quay lại menu chính..." + Color.RESET);
                         continuePaging = false;
-                        System.out.println(Color.YELLOW + "Đã quay lại menu chính." + Color.RESET);
-                        break;
-                    default:
+                    } else {
                         System.out.println(Color.RED + "Lựa chọn không hợp lệ." + Color.RESET);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -460,14 +537,19 @@ public class AdminUI {
         StudentServiceImp studentServiceImp = new StudentServiceImp();
         boolean continueProgram = true;
         do {
-            System.out.println(Color.MAGENTA + "=== ADMIN UI ===" + Color.RESET);
-            System.out.println(Color.YELLOW + "1. Hiển thị danh sách sinh viên" + Color.RESET);
-            System.out.println(Color.YELLOW + "2. Thêm mới sinh viên" + Color.RESET);
-            System.out.println(Color.YELLOW + "3. Chỉnh sửa sinh viên" + Color.RESET);
-            System.out.println(Color.YELLOW + "4. Xóa sinh viên theo id" + Color.RESET);
-            System.out.println(Color.YELLOW + "5. Tìm kiếm sinh viên theo tên,email,mã id" + Color.RESET);
-            System.out.println(Color.YELLOW + "6. Sắp xếp sinh viên" + Color.RESET);
-            System.out.println(Color.RED + "7. Thoát" + Color.RESET);
+
+            System.out.println(Color.CYAN + "============================= ADMIN UI ==============================" + Color.RESET);
+            System.out.println(Color.CYAN + "╔════════════╦══════════════════════════════════════════════════════╗");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "Lựa chọn", "Mô tả");
+            System.out.println("╠════════════╬══════════════════════════════════════════════════════╣");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "1", "Hiển thị danh sách sinh viên");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "2", "Thêm mới sinh viên");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "3", "Chỉnh sửa sinh viên");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "4", "Xóa sinh viên theo id");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "5", "Tìm kiếm sinh viên theo tên,email,mã id");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "6", "Sắp xếp sinh viên");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "7", "Thoát");
+            System.out.println("╚════════════╩══════════════════════════════════════════════════════╝" + Color.RESET);
             int choice = Validator.validateInteger(Color.MAGENTA + "Chọn tùy chọn: " + Color.RESET,MainApplication.sc);
 
             switch (choice) {
@@ -490,6 +572,7 @@ public class AdminUI {
                     sortStudentsWithPaging(MainApplication.sc,studentServiceImp);
                     break;
                 case 7:
+                    System.out.println(Color.YELLOW + "Đã quay lại menu chính." + Color.RESET);
                     continueProgram = false;
                     break;
                 default:
@@ -500,80 +583,101 @@ public class AdminUI {
 
     public static void displayListStudent(Scanner sc, StudentServiceImp studentServiceImp) {
         int currentPage = 1;
-        int pageSize = 5;
+        int pageSize = StudentValidator.validatePageSize(sc);
         boolean continueList = true;
 
         try {
             while (continueList) {
                 PageInfo<Student> pageInfo = studentServiceImp.getPageData(currentPage, pageSize);
                 List<Student> students = pageInfo.getRecords();
+                int totalPages = pageInfo.getTotalPages();
 
-                System.out.println(Color.MAGENTA + "\n--- Danh sách sinh viên (Trang " + pageInfo.getCurrentPage() + "/" + pageInfo.getTotalPages() + ") --- Tổng " + pageInfo.getTotalRecords() + " sinh viên" + Color.RESET);
+                System.out.println(Color.MAGENTA + "\n--- Danh sách sinh viên (Trang " + pageInfo.getCurrentPage() + "/" + totalPages + ") --- Tổng " + pageInfo.getTotalRecords() + " sinh viên" + Color.RESET);
 
                 if (students.isEmpty()) {
                     System.out.println(Color.RED + "Không có sinh viên nào ở trang này." + Color.RESET);
                 } else {
                     // Đóng khung bảng
-                    System.out.println(Color.YELLOW + "+-----+----------------------+--------------+--------------------+--------------------------+---------+--------------+");
-                    System.out.printf(Color.CYAN + "| %-3s | %-20s | %-12s | %-18s | %-25s | %-7s | %-12s |\n" + Color.RESET,
-                            "ID", "Tên sinh viên", "Ngày sinh", "Email", "Số điện thoại", "Giới tính", "Ngày tạo");
-                    System.out.println(Color.YELLOW + "+-----+----------------------+--------------+--------------------+--------------------------+---------+--------------+");
+                    System.out.println(Color.BLUE + "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════╗" + Color.RESET);
+                    System.out.printf(Color.YELLOW + "║ %-105s ║\n" + Color.RESET,
+                            "DANH SÁCH SINH VIÊN - Trang " + pageInfo.getCurrentPage() + "/" + totalPages +
+                                    " (Tổng cộng: " + pageInfo.getTotalRecords() + " sinh viên)");
+                    System.out.println(Color.BLUE + "╠═════╦════════════════════════════════════════════╦════════════╦═══════════════════════════╦═══════════════╣" + Color.RESET);
+                    System.out.printf(Color.CYAN + "║ %-3s ║ %-42s ║ %-10s ║ %-25s ║ %-13s ║\n" + Color.RESET,
+                            "ID", "Tên sinh viên", "Ngày sinh", "Email", "Số điện thoại");
+                    System.out.println(Color.BLUE + "╠═════╬════════════════════════════════════════════╬════════════╬═══════════════════════════╬═══════════════╣" + Color.RESET);
 
-                    // In dữ liệu sinh viên
                     for (Student student : students) {
                         String gender = student.isStatus() ? "Nam" : "Nữ";
-                        System.out.printf(Color.WHITE + "| %-3d | %-20s | %-12s | %-18s | %-25s | %-7s | %-12s |\n" + Color.RESET,
-                                student.getId(), student.getName(), student.getBirthday(), student.getEmail(),
-                                student.getPhone(), gender, student.getCreated_at());
+                        System.out.printf(Color.WHITE + "║ %-3d ║ %-42s ║ %-9s ║ %-25s ║ %-13s ║\n" + Color.RESET,
+                                student.getId(), student.getName(), student.getBirthday(), student.getEmail(), student.getPhone());
                     }
 
-                    // Đóng khung bảng kết thúc
-                    System.out.println(Color.YELLOW + "+-----+----------------------+--------------+--------------------+--------------------------+---------+--------------+" + Color.RESET);
+                    System.out.println(Color.BLUE + "╚═════╩════════════════════════════════════════════╩════════════╩═══════════════════════════╩═══════════════╝" + Color.RESET);
                 }
 
-                // Tùy chọn điều hướng
-                System.out.println(Color.MAGENTA + "\n== Tùy chọn điều hướng ==" + Color.RESET);
-                System.out.println(Color.YELLOW + "1. Trang tiếp" + Color.RESET);
-                System.out.println(Color.YELLOW + "2. Trang trước" + Color.RESET);
-                System.out.println(Color.YELLOW + "3. Đến trang cụ thể" + Color.RESET);
-                System.out.println(Color.YELLOW + "4. Quay lại menu chính" + Color.RESET);
+                if (totalPages > 1) {
+                    System.out.println(Color.MAGENTA + "\nChọn trang (gõ số trang / 0: quay lại menu chính)" + Color.RESET);
+                    System.out.print(Color.YELLOW + "Trang: " + Color.RESET);
 
-                // Nhận lựa chọn từ người dùng
-                int choiceInput = Validator.validateInteger(Color.MAGENTA + "Lựa chọn: " + Color.RESET, sc);
-                switch (choiceInput) {
-                    case 1:
-                        if (currentPage < pageInfo.getTotalPages()) {
-                            currentPage++;
+                    for (int i = 1; i <= totalPages; i++) {
+                        if (i == currentPage) {
+                            System.out.print(Color.GREEN + "[" + i + "] " + Color.RESET);
                         } else {
-                            System.out.println(Color.RED + "Bạn đang ở trang cuối cùng." + Color.RESET);
+                            System.out.print(Color.GRAY + i + " " + Color.RESET);
                         }
-                        break;
-                    case 2:
-                        if (currentPage > 1) {
-                            currentPage--;
-                        } else {
-                            System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
-                        }
-                        break;
-                    case 3:
-                        System.out.print(Color.WHITE + "Nhập số trang (1 - " + pageInfo.getTotalPages() + "): " + Color.RESET);
-                        try {
-                            int targetPage = Integer.parseInt(sc.nextLine());
-                            if (targetPage >= 1 && targetPage <= pageInfo.getTotalPages()) {
-                                currentPage = targetPage;
+                    }
+
+                    if (currentPage < totalPages) {
+                        System.out.print(Color.CYAN + " / n: next" + Color.RESET);
+                    }
+                    if (currentPage > 1) {
+                        System.out.print(Color.CYAN + " / p: prev" + Color.RESET);
+                    }
+
+                    String choice = Validator.validateNonEmptyString("\n" + Color.CYAN + "Nhập lựa chọn: " + Color.RESET, sc);
+
+                    switch (choice) {
+                        case "n":
+                            if (currentPage < totalPages) {
+                                currentPage++;
                             } else {
-                                System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                                System.out.println(Color.RED + "Bạn đang ở trang cuối cùng." + Color.RESET);
                             }
-                        } catch (NumberFormatException e) {
-                            System.out.println(Color.RED + "Vui lòng nhập số nguyên." + Color.RESET);
-                        }
-                        break;
-                    case 4:
+                            break;
+                        case "p":
+                            if (currentPage > 1) {
+                                currentPage--;
+                            } else {
+                                System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
+                            }
+                            break;
+                        case "0":
+                            System.out.println(Color.YELLOW + "Quay lại menu chính..." + Color.RESET);
+                            continueList = false;
+                            break;
+                        default:
+                            try {
+                                int page = Integer.parseInt(choice);
+                                if (page >= 1 && page <= totalPages) {
+                                    currentPage = page;
+                                } else {
+                                    System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println(Color.RED + "Lựa chọn không hợp lệ. Nhập số trang hoặc n / p / 0." + Color.RESET);
+                            }
+                            break;
+                    }
+                } else {
+                    System.out.println(Color.MAGENTA + "\nChọn 0 để quay lại menu chính." + Color.RESET);
+                    String choice = sc.nextLine().trim().toLowerCase();
+                    if (choice.equals("0")) {
+                        System.out.println(Color.YELLOW + "Quay lại menu chính..." + Color.RESET);
                         continueList = false;
-                        System.out.println(Color.YELLOW + "Đã quay lại menu chính." + Color.RESET);
-                        break;
-                    default:
+                    } else {
                         System.out.println(Color.RED + "Lựa chọn không hợp lệ." + Color.RESET);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -585,14 +689,16 @@ public class AdminUI {
     public static void addStudent(StudentServiceImp studentServiceImp) {
         List<Student> studentList = studentServiceImp.getAll();
 
-        // Tạo một đối tượng khóa học mới
         Student newStudent = new Student();
+        System.out.println("Danh sách sinh viên hiện có:");
+        for (Student s : studentList) {
+            System.out.println("- " + s.getEmail());
+        }
 
-        // Nhập dữ liệu cho khóa học, truyền vào courseList để kiểm tra tên trùng
         newStudent.inputData(MainApplication.sc, studentList);
 
-        // Lưu khóa học và kiểm tra kết quả
         boolean isAdded = studentServiceImp.save(newStudent);
+
         if (isAdded) {
             System.out.println(Color.GREEN + "Thêm sinh viên thành công." + Color.RESET);
         } else {
@@ -694,84 +800,108 @@ public class AdminUI {
     }
 
     public static void deleteStudent(Scanner sc, StudentServiceImp studentServiceImp) {
-        int deleteId = Validator.validateInteger(Color.WHITE + "Nhập ID sinh viên muốn xóa: " + Color.RESET,sc);
-        boolean isDeleted = studentServiceImp.delete(deleteId);
-        if (isDeleted) {
-            System.out.println(Color.GREEN + "Xóa sinh viên thành công." + Color.RESET);
-        }
+        int deleteId = Validator.validateInteger(Color.WHITE + "Nhập ID sinh viên muốn xóa: " + Color.RESET, sc);
+        studentServiceImp.delete(deleteId);
     }
 
     public static void searchStudentByKeyword(Scanner sc, StudentServiceImp studentServiceImp) {
         String keyword = Validator.validateNonEmptyString(Color.WHITE + "Nhập tên, email hoặc mã học viên cần tìm: " + Color.RESET, sc);
 
         int currentPage = 1;
-        int pageSize = 5;
+        int pageSize = StudentValidator.validatePageSize(sc);
         boolean continueSearch = true;
 
         try {
             while (continueSearch) {
                 PageInfo<Student> pageInfo = studentServiceImp.searchByKeyword(keyword, currentPage, pageSize);
                 List<Student> students = pageInfo.getRecords();
+                int totalPages = pageInfo.getTotalPages();
 
-                System.out.println(Color.MAGENTA + "\n--- Kết quả tìm kiếm học viên (Trang " + pageInfo.getCurrentPage() + "/" + pageInfo.getTotalPages() + ") --- Tổng " + pageInfo.getTotalRecords() + " học viên" + Color.RESET);
+                System.out.println(Color.MAGENTA + "\n--- Kết quả tìm kiếm học viên (Trang " + pageInfo.getCurrentPage() + "/" + totalPages + ") --- Tổng " + pageInfo.getTotalRecords() + " học viên" + Color.RESET);
 
                 if (students.isEmpty()) {
                     System.out.println(Color.RED + "Không tìm thấy học viên nào với từ khóa: " + keyword + Color.RESET);
                 } else {
-                    System.out.println(Color.CYAN + "+-----+--------------------------+--------------------------+-----------------+");
-                    System.out.printf("| %-5s | %-24s | %-24s | %-15s |\n", "ID", "Họ tên", "Email", "Ngày tạo");
-                    System.out.println("+-----+--------------------------+--------------------------+-----------------+");
+                    // Hiển thị bảng giống form gốc
+                    System.out.println(Color.BLUE + "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════╗" + Color.RESET);
+                    System.out.printf(Color.YELLOW + "║ %-105s ║\n" + Color.RESET,
+                            "KẾT QUẢ TÌM KIẾM - Trang " + pageInfo.getCurrentPage() + "/" + totalPages +
+                                    " (Tổng cộng: " + pageInfo.getTotalRecords() + " học viên)");
+                    System.out.println(Color.BLUE + "╠═════╦════════════════════════════════════════════╦════════════╦═══════════════════════════╦═══════════════╣" + Color.RESET);
+                    System.out.printf(Color.CYAN + "║ %-3s ║ %-42s ║ %-10s ║ %-25s ║ %-13s ║\n" + Color.RESET,
+                            "ID", "Tên học viên", "Ngày sinh", "Email", "Số điện thoại");
+                    System.out.println(Color.BLUE + "╠═════╬════════════════════════════════════════════╬════════════╬═══════════════════════════╬═══════════════╣" + Color.RESET);
 
                     for (Student student : students) {
-                        System.out.printf(Color.WHITE + "| %-5d | %-24s | %-24s | %-15s |\n" + Color.RESET,
-                                student.getId(), student.getName(), student.getEmail(), student.getCreated_at());
+                        System.out.printf(Color.WHITE + "║ %-3d ║ %-42s ║ %-9s ║ %-25s ║ %-13s ║\n" + Color.RESET,
+                                student.getId(), student.getName(), student.getBirthday(), student.getEmail(), student.getPhone());
                     }
 
-                    System.out.println("+-----+--------------------------+--------------------------+-----------------+");
+                    System.out.println(Color.BLUE + "╚═════╩════════════════════════════════════════════╩════════════╩═══════════════════════════╩═══════════════╝" + Color.RESET);
                 }
 
-                System.out.println(Color.MAGENTA + "\n== Tùy chọn điều hướng ==" + Color.RESET);
-                System.out.println(Color.YELLOW + "1. Trang tiếp" + Color.RESET);
-                System.out.println(Color.YELLOW + "2. Trang trước" + Color.RESET);
-                System.out.println(Color.YELLOW + "3. Đến trang cụ thể" + Color.RESET);
-                System.out.println(Color.YELLOW + "4. Quay lại menu chính" + Color.RESET);
-                System.out.print(Color.MAGENTA + "Lựa chọn: " + Color.RESET);
+                if (totalPages > 1) {
+                    System.out.println(Color.MAGENTA + "\nChọn trang (gõ số trang / 0: quay lại menu chính)" + Color.RESET);
+                    System.out.print(Color.YELLOW + "Trang: " + Color.RESET);
 
-                String choiceInput = sc.nextLine();
-                switch (choiceInput) {
-                    case "1":
-                        if (currentPage < pageInfo.getTotalPages()) {
-                            currentPage++;
+                    for (int i = 1; i <= totalPages; i++) {
+                        if (i == currentPage) {
+                            System.out.print(Color.GREEN + "[" + i + "] " + Color.RESET);
                         } else {
-                            System.out.println(Color.RED + "Bạn đang ở trang cuối cùng." + Color.RESET);
+                            System.out.print(Color.GRAY + i + " " + Color.RESET);
                         }
-                        break;
-                    case "2":
-                        if (currentPage > 1) {
-                            currentPage--;
-                        } else {
-                            System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
-                        }
-                        break;
-                    case "3":
-                        System.out.print(Color.WHITE + "Nhập số trang (1 - " + pageInfo.getTotalPages() + "): " + Color.RESET);
-                        try {
-                            int targetPage = Integer.parseInt(sc.nextLine());
-                            if (targetPage >= 1 && targetPage <= pageInfo.getTotalPages()) {
-                                currentPage = targetPage;
+                    }
+
+                    if (currentPage < totalPages) {
+                        System.out.print(Color.CYAN + " / n: next" + Color.RESET);
+                    }
+                    if (currentPage > 1) {
+                        System.out.print(Color.CYAN + " / p: prev" + Color.RESET);
+                    }
+
+                    String choice = Validator.validateNonEmptyString("\n" + Color.CYAN + "Nhập lựa chọn: " + Color.RESET, sc);
+
+                    switch (choice) {
+                        case "n":
+                            if (currentPage < totalPages) {
+                                currentPage++;
                             } else {
-                                System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                                System.out.println(Color.RED + "Bạn đang ở trang cuối cùng." + Color.RESET);
                             }
-                        } catch (NumberFormatException e) {
-                            System.out.println(Color.RED + "Vui lòng nhập số nguyên." + Color.RESET);
-                        }
-                        break;
-                    case "4":
+                            break;
+                        case "p":
+                            if (currentPage > 1) {
+                                currentPage--;
+                            } else {
+                                System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
+                            }
+                            break;
+                        case "0":
+                            System.out.println(Color.YELLOW + "Quay lại menu chính..." + Color.RESET);
+                            continueSearch = false;
+                            break;
+                        default:
+                            try {
+                                int page = Integer.parseInt(choice);
+                                if (page >= 1 && page <= totalPages) {
+                                    currentPage = page;
+                                } else {
+                                    System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println(Color.RED + "Lựa chọn không hợp lệ. Nhập số trang hoặc n / p / 0." + Color.RESET);
+                            }
+                            break;
+                    }
+                } else {
+                    System.out.println(Color.MAGENTA + "\nChọn 0 để quay lại menu chính." + Color.RESET);
+                    String choice = sc.nextLine().trim().toLowerCase();
+                    if (choice.equals("0")) {
+                        System.out.println(Color.YELLOW + "Quay lại menu chính..." + Color.RESET);
                         continueSearch = false;
-                        System.out.println(Color.YELLOW + "Đã quay lại menu chính." + Color.RESET);
-                        break;
-                    default:
+                    } else {
                         System.out.println(Color.RED + "Lựa chọn không hợp lệ." + Color.RESET);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -785,73 +915,97 @@ public class AdminUI {
         int pageSize = StudentValidator.validatePageSize(sc);
 
         int currentPage = 1;
-        boolean continuePaging = true;
+        boolean continueList = true;
 
         try {
-            while (continuePaging) {
+            while (continueList) {
                 PageInfo<Student> pageInfo = studentServiceImp.getSortedPagedData(sortColumn, sortOrder, currentPage, pageSize);
                 List<Student> students = pageInfo.getRecords();
+                int totalPages = pageInfo.getTotalPages();
 
-                System.out.println(Color.MAGENTA + "\n--- Danh sách sắp xếp (Trang " + pageInfo.getCurrentPage() + "/" + pageInfo.getTotalPages() + ") --- Tổng " + pageInfo.getTotalRecords() + " sinh viên" + Color.RESET);
+                // In bảng kết quả
+                System.out.println(Color.BLUE + "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════╗" + Color.RESET);
+                System.out.printf(Color.YELLOW + "║ %-105s ║\n" + Color.RESET,
+                        "KẾT QUẢ SẮP XẾP - Trang " + pageInfo.getCurrentPage() + "/" + totalPages +
+                                " (Tổng cộng: " + pageInfo.getTotalRecords() + " học viên)");
+                System.out.println(Color.BLUE + "╠═════╦════════════════════════════════════════════╦════════════╦═══════════════════════════╦═══════════════╣" + Color.RESET);
+                System.out.printf(Color.CYAN + "║ %-3s ║ %-42s ║ %-10s ║ %-25s ║ %-13s ║\n" + Color.RESET,
+                        "ID", "Tên học viên", "Ngày sinh", "Email", "Số điện thoại");
+                System.out.println(Color.BLUE + "╠═════╬════════════════════════════════════════════╬════════════╬═══════════════════════════╬═══════════════╣" + Color.RESET);
 
                 if (students.isEmpty()) {
-                    System.out.println(Color.RED + "Không có sinh viên nào." + Color.RESET);
+                    System.out.println(Color.RED + "║                                Không có học viên nào để hiển thị.                                 ║" + Color.RESET);
                 } else {
-                    System.out.println(Color.CYAN + "+-----+----------------------+--------------+----------------------+-----------------+-----------------+------------+");
-                    System.out.printf("| %-5s | %-20s | %-12s | %-20s | %-15s | %-15s | %-10s |\n", "ID", "Tên sinh viên", "Ngày sinh", "Email", "Số điện thoại", "Giới tính", "Ngày tạo");
-                    System.out.println("+-----+----------------------+--------------+----------------------+-----------------+-----------------+------------+");
-
                     for (Student student : students) {
-                        System.out.printf(Color.WHITE + "| %-5d | %-20s | %-12s | %-20s | %-15s | %-15s | %-10s |\n" + Color.RESET,
-                                student.getId(), student.getName(), student.getBirthday(),
-                                student.getEmail(), student.getPhone(), student.isStatus(), student.getCreated_at());
+                        System.out.printf(Color.WHITE + "║ %-3d ║ %-42s ║ %-10s ║ %-25s ║ %-13s ║\n" + Color.RESET,
+                                student.getId(), student.getName(), student.getBirthday(), student.getEmail(), student.getPhone());
                     }
-
-                    System.out.println("+-----+----------------------+--------------+----------------------+-----------------+-----------------+------------+");
                 }
 
-                System.out.println(Color.MAGENTA + "\n== Tùy chọn điều hướng ==" + Color.RESET);
-                System.out.println(Color.YELLOW + "1. Trang tiếp" + Color.RESET);
-                System.out.println(Color.YELLOW + "2. Trang trước" + Color.RESET);
-                System.out.println(Color.YELLOW + "3. Đến trang cụ thể" + Color.RESET);
-                System.out.println(Color.YELLOW + "4. Quay lại menu chính" + Color.RESET);
-                System.out.print(Color.MAGENTA + "Lựa chọn: " + Color.RESET);
+                System.out.println(Color.BLUE + "╚═════╩════════════════════════════════════════════╩════════════╩═══════════════════════════╩═══════════════╝" + Color.RESET);
 
-                String choice = sc.nextLine();
-                switch (choice) {
-                    case "1":
-                        if (currentPage < pageInfo.getTotalPages()) {
-                            currentPage++;
+                if (totalPages > 1) {
+                    System.out.println(Color.MAGENTA + "\nChọn trang (gõ số trang / 0: quay lại menu chính)" + Color.RESET);
+                    System.out.print(Color.YELLOW + "Trang: " + Color.RESET);
+
+                    for (int i = 1; i <= totalPages; i++) {
+                        if (i == currentPage) {
+                            System.out.print(Color.GREEN + "[" + i + "] " + Color.RESET);
                         } else {
-                            System.out.println(Color.RED + "Bạn đang ở trang cuối cùng." + Color.RESET);
+                            System.out.print(Color.GRAY + i + " " + Color.RESET);
                         }
-                        break;
-                    case "2":
-                        if (currentPage > 1) {
-                            currentPage--;
-                        } else {
-                            System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
-                        }
-                        break;
-                    case "3":
-                        System.out.print(Color.WHITE + "Nhập số trang (1 - " + pageInfo.getTotalPages() + "): " + Color.RESET);
-                        try {
-                            int targetPage = Integer.parseInt(sc.nextLine());
-                            if (targetPage >= 1 && targetPage <= pageInfo.getTotalPages()) {
-                                currentPage = targetPage;
+                    }
+
+                    if (currentPage < totalPages) {
+                        System.out.print(Color.CYAN + "/ n: next " + Color.RESET);
+                    }
+                    if (currentPage > 1) {
+                        System.out.print(Color.CYAN + "/ p: prev" + Color.RESET);
+                    }
+
+                    String choice = Validator.validateNonEmptyString("\n" + Color.CYAN + "Nhập lựa chọn: " + Color.RESET, sc).trim().toLowerCase();
+
+                    switch (choice) {
+                        case "n":
+                            if (currentPage < totalPages) {
+                                currentPage++;
                             } else {
-                                System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                                System.out.println(Color.RED + "Bạn đang ở trang cuối cùng." + Color.RESET);
                             }
-                        } catch (NumberFormatException e) {
-                            System.out.println(Color.RED + "Vui lòng nhập số nguyên." + Color.RESET);
-                        }
-                        break;
-                    case "4":
-                        continuePaging = false;
-                        System.out.println(Color.YELLOW + "Đã quay lại menu chính." + Color.RESET);
-                        break;
-                    default:
+                            break;
+                        case "p":
+                            if (currentPage > 1) {
+                                currentPage--;
+                            } else {
+                                System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
+                            }
+                            break;
+                        case "0":
+                            System.out.println(Color.YELLOW + "Quay lại menu chính..." + Color.RESET);
+                            continueList = false;
+                            break;
+                        default:
+                            try {
+                                int page = Integer.parseInt(choice);
+                                if (page >= 1 && page <= totalPages) {
+                                    currentPage = page;
+                                } else {
+                                    System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println(Color.RED + "Lựa chọn không hợp lệ. Nhập số trang hoặc n / p / 0." + Color.RESET);
+                            }
+                            break;
+                    }
+                } else {
+                    System.out.println(Color.MAGENTA + "\nChọn 0 để quay lại menu chính." + Color.RESET);
+                    String choice = sc.nextLine().trim();
+                    if (choice.equals("0")) {
+                        System.out.println(Color.YELLOW + "Quay lại menu chính..." + Color.RESET);
+                        continueList = false;
+                    } else {
                         System.out.println(Color.RED + "Lựa chọn không hợp lệ." + Color.RESET);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -864,16 +1018,15 @@ public class AdminUI {
         EnrollmentServiceImp enrollmentServiceImp = new EnrollmentServiceImp();
         boolean continueProgram = true;
         do {
-            System.out.println(Color.MAGENTA + "=== ADMIN UI ===" + Color.RESET);
-
-            System.out.println(Color.CYAN + "+------------+------------------------------------------+");
-            System.out.printf("| %-10s | %-40s |\n", "Lựa chọn", "Mô tả");
-            System.out.println("+------------+------------------------------------------+");
-            System.out.printf("| %-10d | %-40s |\n", 1, "Hiển thị danh sách đăng ký khóa học");
-            System.out.printf("| %-10d | %-40s |\n", 2, "Duyệt sinh viên đăng ký khóa học");
-            System.out.printf("| %-10d | %-40s |\n", 3, "Từ chối sinh viên khỏi khóa học");
-            System.out.printf("| %-10d | %-40s |\n", 4, "Thoát");
-            System.out.println("+------------+------------------------------------------+");
+            System.out.println(Color.CYAN + "============================= ADMIN UI ==============================" + Color.RESET);
+            System.out.println(Color.CYAN + "╔════════════╦══════════════════════════════════════════════════════╗");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "Lựa chọn", "Mô tả");
+            System.out.println("╠════════════╬══════════════════════════════════════════════════════╣");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "1", "Hiển thị danh sách đăng ký khóa học");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "2", "Duyệt sinh viên đăng ký khóa học");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "3", "Từ chối sinh viên khỏi khóa học");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "4", "Thoát");
+            System.out.println("╚════════════╩══════════════════════════════════════════════════════╝" + Color.RESET);
 
             int choice = Validator.validateInteger(Color.MAGENTA + "Chọn tùy chọn: " + Color.RESET,MainApplication.sc);
             switch (choice) {
@@ -887,6 +1040,7 @@ public class AdminUI {
                     rejectStudentEnrollment(MainApplication.sc, enrollmentServiceImp);
                     break;
                 case 4:
+                    System.out.println(Color.YELLOW + "Đã quay lại menu chính." + Color.RESET);
                     continueProgram = false;
                     break;
                 default:
@@ -904,91 +1058,170 @@ public class AdminUI {
             return;
         }
 
-        System.out.println(Color.CYAN + "+-----+-------------------------------+");
-        System.out.printf("| %-5s | %-30s |\n", "ID", "Tên khóa học");
-        System.out.println("+-----+-------------------------------+");
-        for (Course c : courses) {
-            System.out.printf("| %-5d | %-30s |\n", c.getId(), c.getName());
-        }
-        System.out.println("+-----+-------------------------------+");
+        int currentPageCourse = 1;
+        int pageSizeCourse = StudentValidator.validatePageSize(sc);
+        int totalCourses = courses.size();
+        int totalPagesCourse = (int) Math.ceil((double) totalCourses / pageSizeCourse);
+        boolean choosingCourse = true;
+        int courseId = -1;
 
-        int courseId = Validator.validateInteger("Nhập ID khóa học: ", sc);
+        while (choosingCourse) {
+            int start = (currentPageCourse - 1) * pageSizeCourse;
+            int end = Math.min(start + pageSizeCourse, totalCourses);
+
+            System.out.println(Color.CYAN + "\n╔═════ DANH SÁCH KHÓA HỌC ═════════════════════════════════════╗" + Color.RESET);
+            System.out.printf(Color.YELLOW + "║ Trang %d/%d (Hiển thị %d - %d trong tổng %d khóa học)           ║\n" + Color.RESET,
+                    currentPageCourse, totalPagesCourse, start + 1, end, totalCourses);
+            System.out.println(Color.CYAN + "╠═════╦════════════════════════════════════════════════════════╣" + Color.RESET);
+            System.out.printf(Color.CYAN + "║ %-3s ║ %-54s ║\n" + Color.RESET, "ID", "Tên khóa học");
+            System.out.println(Color.CYAN + "╠═════╬════════════════════════════════════════════════════════╣" + Color.RESET);
+
+            for (int i = start; i < end; i++) {
+                Course c = courses.get(i);
+                System.out.printf(Color.WHITE + "║ %-3d ║ %-54s ║\n" + Color.RESET, c.getId(), c.getName());
+            }
+
+            System.out.println(Color.CYAN + "╚═════╩════════════════════════════════════════════════════════╝" + Color.RESET);
+
+            // Điều hướng phân trang khóa học
+            if (totalPagesCourse > 1) {
+                System.out.println(Color.MAGENTA + "\nChọn trang (gõ số trang / 0: chọn ID khóa học)" + Color.RESET);
+                System.out.print(Color.YELLOW + "Trang: " + Color.RESET);
+
+                for (int i = 1; i <= totalPagesCourse; i++) {
+                    if (i == currentPageCourse) {
+                        System.out.print(Color.GREEN + "[" + i + "] " + Color.RESET);
+                    } else {
+                        System.out.print(Color.GRAY + i + " " + Color.RESET);
+                    }
+                }
+
+                if (currentPageCourse < totalPagesCourse) {
+                    System.out.print(Color.CYAN + "/ n: next " + Color.RESET);
+                }
+                if (currentPageCourse > 1) {
+                    System.out.print(Color.CYAN + "/ p: prev" + Color.RESET);
+                }
+
+
+                String choice = Validator.validateNonEmptyString("\n" + Color.CYAN + "Nhập lựa chọn: " + Color.RESET, sc).trim().toLowerCase();
+                switch (choice) {
+                    case "n":
+                        if (currentPageCourse < totalPagesCourse) currentPageCourse++;
+                        else System.out.println(Color.RED + "Bạn đang ở trang cuối." + Color.RESET);
+                        break;
+                    case "p":
+                        if (currentPageCourse > 1) currentPageCourse--;
+                        else System.out.println(Color.RED + "Bạn đang ở trang đầu." + Color.RESET);
+                        break;
+                    case "0":
+                        courseId = Validator.validateInteger("Nhập ID khóa học: ", sc);
+                        choosingCourse = false;
+                        break;
+                    default:
+                        try {
+                            int page = Integer.parseInt(choice);
+                            if (page >= 1 && page <= totalPagesCourse) currentPageCourse = page;
+                            else System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                        } catch (NumberFormatException e) {
+                            System.out.println(Color.RED + "Lựa chọn không hợp lệ." + Color.RESET);
+                        }
+                }
+            } else {
+                courseId = Validator.validateInteger("Nhập ID khóa học: ", sc);
+                choosingCourse = false;
+            }
+        }
+
+        // ===== Hiển thị danh sách sinh viên đăng ký khóa học đó =====
         int currentPage = 1;
-        final int pageSize = 5;
+        int pageSize = StudentValidator.validatePageSize(sc);
         boolean continuePaging = true;
 
         try {
             while (continuePaging) {
                 PageInfo<Enrollment> pageInfo = enrollmentServiceImp.getStudentsByCoursePaginated(courseId, currentPage, pageSize);
                 List<Enrollment> enrollments = pageInfo.getRecords();
+                int totalPages = pageInfo.getTotalPages();
 
-                System.out.printf(Color.MAGENTA + "\n--- KHÓA HỌC ID: %d - Trang %d/%d ---\nTổng số sinh viên đăng ký: %d\n" + Color.RESET,
-                        courseId, pageInfo.getCurrentPage(), pageInfo.getTotalPages(), pageInfo.getTotalRecords());
+                System.out.println(Color.BLUE + "╔════════════════════════════════════════════════════════════════════════════╗" + Color.RESET);
+                System.out.printf(Color.YELLOW + "║ %-74s ║\n" + Color.RESET,
+                        "DANH SÁCH SINH VIÊN - Khóa học ID: " + courseId + " - Trang " + pageInfo.getCurrentPage() + "/" + totalPages +
+                                " (Tổng cộng: " + pageInfo.getTotalRecords() + " sinh viên)");
+                System.out.println(Color.BLUE + "╠═══════╦════════════════════════════════╦════════════════════╦══════════════╣" + Color.RESET);
+                System.out.printf(Color.CYAN + "║ %-5s ║ %-30s ║ %-18s ║ %-12s ║\n" + Color.RESET,
+                        "Mã SV", "Tên sinh viên", "Ngày đăng ký", "Trạng thái");
+                System.out.println(Color.BLUE + "╠═══════╬════════════════════════════════╬════════════════════╬══════════════╣" + Color.RESET);
 
                 if (enrollments.isEmpty()) {
-                    System.out.println(Color.RED + "Không có sinh viên nào ở trang này." + Color.RESET);
+                    System.out.println(Color.RED + "║                     Không có sinh viên nào để hiển thị.                    ║" + Color.RESET);
                 } else {
-                    System.out.println("+------------+-------------------------+---------------------+-----------------+");
-                    System.out.printf("| %-10s | %-23s | %-19s | %-15s |\n", "Mã SV", "Tên sinh viên", "Ngày đăng ký", "Trạng thái");
-                    System.out.println("+------------+-------------------------+---------------------+-----------------+");
-
                     for (Enrollment e : enrollments) {
-                        System.out.printf("| %-10d | %-23s | %-19s | %-15s |\n",
+                        System.out.printf(Color.WHITE + "║ %-5d ║ %-30s ║ %-18s ║ %-12s ║\n" + Color.RESET,
                                 e.getStudentId(),
                                 e.getStudentName(),
                                 e.getRegisteredAt().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")),
                                 e.getStatus());
                     }
-
-                    System.out.println("+------------+-------------------------+---------------------+-----------------+");
                 }
 
-                System.out.println(Color.MAGENTA + "\n== Tùy chọn điều hướng ==" + Color.RESET);
-                System.out.println(Color.YELLOW + "1. Trang tiếp" + Color.RESET);
-                System.out.println(Color.YELLOW + "2. Trang trước" + Color.RESET);
-                System.out.println(Color.YELLOW + "3. Đến trang cụ thể" + Color.RESET);
-                System.out.println(Color.YELLOW + "4. Quay lại menu chính" + Color.RESET);
-                int choice = Validator.validateInteger(Color.MAGENTA + "Lựa chọn: " + Color.RESET, sc);
+                System.out.println(Color.BLUE + "╚═══════╩════════════════════════════════╩════════════════════╩══════════════╝" + Color.RESET);
 
-                switch (choice) {
-                    case 1:
-                        if (currentPage < pageInfo.getTotalPages()) {
-                            currentPage++;
+                if (totalPages > 1) {
+                    System.out.println(Color.MAGENTA + "\nChọn trang (gõ số trang / 0: quay lại menu chính)" + Color.RESET);
+                    System.out.print(Color.YELLOW + "Trang: " + Color.RESET);
+
+                    for (int i = 1; i <= totalPages; i++) {
+                        if (i == currentPage) {
+                            System.out.print(Color.GREEN + "[" + i + "] " + Color.RESET);
                         } else {
-                            System.out.println(Color.RED + "Bạn đang ở trang cuối cùng." + Color.RESET);
+                            System.out.print(Color.GRAY + i + " " + Color.RESET);
                         }
-                        break;
-                    case 2:
-                        if (currentPage > 1) {
-                            currentPage--;
-                        } else {
-                            System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
-                        }
-                        break;
-                    case 3:
-                        System.out.print("Nhập số trang (1 - " + pageInfo.getTotalPages() + "): ");
-                        try {
-                            int targetPage = Integer.parseInt(sc.nextLine());
-                            if (targetPage >= 1 && targetPage <= pageInfo.getTotalPages()) {
-                                currentPage = targetPage;
-                            } else {
-                                System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                    }
+
+                    if (currentPage < totalPages) {
+                        System.out.print(Color.CYAN + "/ n: next " + Color.RESET);
+                    }
+                    if (currentPage > 1) {
+                        System.out.print(Color.CYAN + "/ p: prev" + Color.RESET);
+                    }
+
+                    String choice = Validator.validateNonEmptyString("\n" + Color.CYAN + "Nhập lựa chọn: " + Color.RESET, sc).trim().toLowerCase();
+                    switch (choice) {
+                        case "n":
+                            if (currentPage < totalPages) currentPage++;
+                            else System.out.println(Color.RED + "Bạn đang ở trang cuối cùng." + Color.RESET);
+                            break;
+                        case "p":
+                            if (currentPage > 1) currentPage--;
+                            else System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
+                            break;
+                        case "0":
+                            System.out.println(Color.YELLOW + "Quay lại menu chính..." + Color.RESET);
+                            continuePaging = false;
+                            break;
+                        default:
+                            try {
+                                int page = Integer.parseInt(choice);
+                                if (page >= 1 && page <= totalPages) currentPage = page;
+                                else System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                            } catch (NumberFormatException e) {
+                                System.out.println(Color.RED + "Lựa chọn không hợp lệ. Nhập số trang hoặc n / p / 0." + Color.RESET);
                             }
-                        } catch (NumberFormatException e) {
-                            System.out.println(Color.RED + "Vui lòng nhập số nguyên." + Color.RESET);
-                        }
-                        break;
-                    case 4:
+                    }
+                } else {
+                    System.out.println(Color.MAGENTA + "\nChọn 0 để quay lại menu chính." + Color.RESET);
+                    String choice = sc.nextLine().trim();
+                    if (choice.equals("0")) {
+                        System.out.println(Color.YELLOW + "Quay lại menu chính..." + Color.RESET);
                         continuePaging = false;
-                        System.out.println(Color.YELLOW + "Đã quay lại menu chính." + Color.RESET);
-                        break;
-                    default:
+                    } else {
                         System.out.println(Color.RED + "Lựa chọn không hợp lệ." + Color.RESET);
+                    }
                 }
             }
         } catch (Exception e) {
             System.out.println(Color.RED + "Đã xảy ra lỗi: " + e.getMessage() + Color.RESET);
-            sc.nextLine();
         }
     }
 
@@ -1095,12 +1328,17 @@ public class AdminUI {
         EnrollmentServiceImp enrollmentServiceImp = new EnrollmentServiceImp();
         boolean continueProgram = true;
         do {
-            System.out.println(Color.MAGENTA + "=== ADMIN UI ===" + Color.RESET);
-            System.out.println(Color.YELLOW + "1. Thống kê tổng số lượng khóa học và tổng số học viên" + Color.RESET);
-            System.out.println(Color.YELLOW + "2. Thống kê tổng số học viên theo từng khóa" + Color.RESET);
-            System.out.println(Color.YELLOW + "3. Thống kê top 5 khóa học đông sinh viên nhất" + Color.RESET);
-            System.out.println(Color.YELLOW + "4. Liệt kê các khóa học có trên 10 học viên" + Color.RESET);
-            System.out.println(Color.RED + "5. Thoát" + Color.RESET);
+            System.out.println(Color.CYAN + "============================= ADMIN UI ==============================" + Color.RESET);
+            System.out.println(Color.CYAN + "╔════════════╦══════════════════════════════════════════════════════╗");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "Lựa chọn", "Mô tả");
+            System.out.println("╠════════════╬══════════════════════════════════════════════════════╣");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "1", "Thống kê tổng số lượng khóa học và tổng số học viên");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "2", "Thống kê tổng số học viên theo từng khóa");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "3", "Thống kê top 5 khóa học đông sinh viên nhất");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "4", "Liệt kê các khóa học có trên 10 học viên");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "5", "Thoát");
+            System.out.println("╚════════════╩══════════════════════════════════════════════════════╝" + Color.RESET);
+
             int choice = Validator.validateInteger(Color.MAGENTA + "Chọn tùy chọn: " + Color.RESET,MainApplication.sc);
 
             switch (choice) {
@@ -1108,7 +1346,7 @@ public class AdminUI {
                     statisticStudentAndCourse(courseServiceImp, enrollmentServiceImp);
                     break;
                 case 2:
-                    statisticStudentsPerCourse();
+                    statisticStudentsPerCourse(MainApplication.sc);
                     break;
                 case 3:
                     statisticTop5Courses();
@@ -1117,6 +1355,7 @@ public class AdminUI {
                     statisticCoursesWithMoreThan10Students();
                     break;
                 case 5:
+                    System.out.println(Color.YELLOW + "Đã quay lại menu chính." + Color.RESET);
                     continueProgram = false;
                     break;
                 default:
@@ -1133,10 +1372,10 @@ public class AdminUI {
 
         System.out.println(Color.CYAN + "\n===== THỐNG KÊ HỆ THỐNG =====" + Color.RESET);
         System.out.println("Tổng số khóa học      : " + Color.YELLOW + totalCourses + Color.RESET);
-        System.out.println("Tổng số học viên    : " + Color.YELLOW + totalConfirmedStudents + " (đã xác nhận)" + Color.RESET);
+        System.out.println("Tổng số học viên    : " + Color.YELLOW + totalConfirmedStudents + Color.RESET);
     }
 
-    public static void statisticStudentsPerCourse() {
+    public static void statisticStudentsPerCourse(Scanner sc) {
         StatisticServiceImp statisticServiceImp = new StatisticServiceImp();
 
         List<Object[]> courseStats = statisticServiceImp.countStudentsGroupByCourse();
@@ -1146,17 +1385,99 @@ public class AdminUI {
             return;
         }
 
-        System.out.println(Color.CYAN + "+-----------------------------+------------------+");
-        System.out.printf("| %-27s | %-16s |\n", "Tên khóa học", "Số học viên");
-        System.out.println("+-----------------------------+------------------+");
+        int currentPage = 1;
+        int pageSize = StudentValidator.validatePageSize(sc);
+        int totalPages = (int) Math.ceil((double) courseStats.size() / pageSize);
 
-        for (Object[] stat : courseStats) {
-            String courseName = (String) stat[0];
-            int studentCount = (int) stat[1];
-            System.out.printf("| %-27s | %-16d |\n", courseName, studentCount);
+        boolean continueListing = true;
+
+        while (continueListing) {
+            int startIndex = (currentPage - 1) * pageSize;
+            int endIndex = Math.min(startIndex + pageSize, courseStats.size());
+
+            // In bảng thống kê
+            System.out.println(Color.CYAN + "╔════════════════════════════════════════════════════════════════════════════════════╗" + Color.RESET);
+            System.out.printf(Color.YELLOW + "║ %-82s ║\n" + Color.RESET,
+                    "THỐNG KÊ SỐ LƯỢNG HỌC VIÊN THEO KHÓA HỌC");
+            System.out.println(Color.CYAN + "╠═════════════════════════════╦══════════════════════════════════════════════════════╣" + Color.RESET);
+            System.out.printf(Color.CYAN + "║ %-27s ║ %-52s ║\n" + Color.RESET, "Tên khóa học", "Số học viên");
+            System.out.println(Color.CYAN + "╠═════════════════════════════╬══════════════════════════════════════════════════════╣" + Color.RESET);
+
+            // In dữ liệu khóa học trong trang hiện tại
+            for (int i = startIndex; i < endIndex; i++) {
+                Object[] stat = courseStats.get(i);
+                String courseName = (String) stat[0];
+                int studentCount = (int) stat[1];
+                System.out.printf(Color.WHITE + "║ %-27s ║ %-52d ║\n" + Color.RESET, courseName, studentCount);
+            }
+
+            System.out.println(Color.CYAN + "╚═════════════════════════════╩══════════════════════════════════════════════════════╝" + Color.RESET);
+
+            // Hiển thị phân trang
+            if (totalPages > 1) {
+                System.out.println(Color.MAGENTA + "\nChọn trang (gõ số trang / 0: quay lại menu chính)" + Color.RESET);
+                System.out.print(Color.YELLOW + "Trang: " + Color.RESET);
+
+                for (int i = 1; i <= totalPages; i++) {
+                    if (i == currentPage) {
+                        System.out.print(Color.GREEN + "[" + i + "] " + Color.RESET);
+                    } else {
+                        System.out.print(Color.GRAY + i + " " + Color.RESET);
+                    }
+                }
+
+                if (currentPage < totalPages) {
+                    System.out.print(Color.CYAN + " / n: next" + Color.RESET);
+                }
+                if (currentPage > 1) {
+                    System.out.print(Color.CYAN + " / p: prev" + Color.RESET);
+                }
+
+                String choice = Validator.validateNonEmptyString("\n" + Color.CYAN + "Nhập lựa chọn: " + Color.RESET, sc);
+
+                switch (choice) {
+                    case "n":
+                        if (currentPage < totalPages) {
+                            currentPage++;
+                        } else {
+                            System.out.println(Color.RED + "Bạn đang ở trang cuối cùng." + Color.RESET);
+                        }
+                        break;
+                    case "p":
+                        if (currentPage > 1) {
+                            currentPage--;
+                        } else {
+                            System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
+                        }
+                        break;
+                    case "0":
+                        System.out.println(Color.YELLOW + "Quay lại menu chính..." + Color.RESET);
+                        continueListing = false;
+                        break;
+                    default:
+                        try {
+                            int page = Integer.parseInt(choice);
+                            if (page >= 1 && page <= totalPages) {
+                                currentPage = page;
+                            } else {
+                                System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println(Color.RED + "Lựa chọn không hợp lệ. Nhập số trang hoặc n / p / 0." + Color.RESET);
+                        }
+                        break;
+                }
+            } else {
+                System.out.println(Color.MAGENTA + "\nChọn 0 để quay lại menu chính." + Color.RESET);
+                String choice = sc.nextLine().trim().toLowerCase();
+                if (choice.equals("0")) {
+                    System.out.println(Color.YELLOW + "Quay lại menu chính..." + Color.RESET);
+                    continueListing = false;
+                } else {
+                    System.out.println(Color.RED + "Lựa chọn không hợp lệ." + Color.RESET);
+                }
+            }
         }
-
-        System.out.println("+-----------------------------+------------------+");
     }
 
     public static void statisticTop5Courses() {
@@ -1204,5 +1525,4 @@ public class AdminUI {
 
         System.out.println("+-----------------------------+------------------+");
     }
-
 }

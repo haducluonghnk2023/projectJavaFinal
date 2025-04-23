@@ -17,6 +17,7 @@ public class Student implements InputTable<Student> {
     private boolean status;
     private String phone;
     private String created_at;
+    private String generatedPassword;
 
     public Student() {
 
@@ -29,6 +30,14 @@ public class Student implements InputTable<Student> {
         this.status = status;
         this.phone = phone;
         this.created_at = created_at;
+    }
+
+    public String getGeneratedPassword() {
+        return generatedPassword;
+    }
+
+    public void setGeneratedPassword(String generatedPassword) {
+        this.generatedPassword = generatedPassword;
     }
 
     public int getId() {

@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public class Validator {
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[\\w.-]+@[\\w.-]+\\.\\w{2,}$");
-    private static final Pattern PHONE_PATTERN = Pattern.compile("^(0|\\+84)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-5]|9[0-9])\\d{7}$");
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^(0|\\+84)(3[2-9]|5[689]|7[06-9]|8[1-5]|9[0-9])\\d{7}$");
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
     static {

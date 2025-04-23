@@ -30,6 +30,7 @@ public class StudentDAOImp implements StudentDAO{
                 student.setStatus(rs.getBoolean("sex"));
                 student.setPhone(rs.getString("phone"));
                 student.setCreated_at(rs.getString("create_at"));
+                students.add(student);
             }
         } catch (SQLException e) {
             System.err.println(Color.RED + "Lỗi khi truy xuất tất cả học viên: " + e.getMessage() + Color.RESET);
@@ -65,7 +66,7 @@ public class StudentDAOImp implements StudentDAO{
 
     @Override
     public boolean save(Student student) {
-        String sql = "{CALL AddStudent(?, ?, ?, ?, ?, ?)}";
+        String sql = "{CALL AddStudent(?, ?, ?, ?, ?, ?)}"; // Thêm tham số OUT
 
         try (Connection conn = ConnectionDB.openConnection();
              CallableStatement callSt = conn.prepareCall(sql)) {
@@ -77,19 +78,40 @@ public class StudentDAOImp implements StudentDAO{
             callSt.setBoolean(4, student.isStatus());
             callSt.setString(5, student.getPhone());
 
+            // Đăng ký tham số OUT cho số lượng dòng bị ảnh hưởng
             callSt.registerOutParameter(6, Types.INTEGER);
 
-            callSt.executeUpdate();
+            boolean hasResult = callSt.execute();
+
+            if (hasResult) {
+                try (ResultSet rs = callSt.getResultSet()) {
+                    if (rs.next()) {
+                        String password = rs.getString("password");
+                        String email = rs.getString("email");
+                        String message = rs.getString("message");
+
+                        System.out.println(Color.GREEN + "Tài khoản tạo thành công cho email: " + email + Color.RESET);
+                        System.out.println(Color.YELLOW + "Mật khẩu tạm thời: " + password + Color.RESET);
+
+                        student.setGeneratedPassword(password);
+                    }
+                }
+            }
 
             int rowsAffected = callSt.getInt(6);
-
             return rowsAffected > 0;
 
         } catch (SQLException e) {
-            System.out.println(Color.RED + "Lỗi khi thêm sinh viên: " + e.getMessage() + Color.RESET);
+            if (e.getMessage().contains("Email đã tồn tại trong hệ thống")) {
+                System.out.println(Color.RED + "Email này đã tồn tại trong hệ thống. Vui lòng chọn email khác." + Color.RESET);
+            } else {
+                System.out.println(Color.RED + "Lỗi khi thêm sinh viên: " + e.getMessage() + Color.RESET);
+            }
             return false;
         }
     }
+
+
 
     @Override
     public boolean update(Student student) {
@@ -123,16 +145,19 @@ public class StudentDAOImp implements StudentDAO{
             callSt.setInt(1, id);
             callSt.execute();
 
+            System.out.println(Color.GREEN + "Xóa sinh viên thành công." + Color.RESET);
             return true;
+
         } catch (SQLException e) {
             if ("45000".equals(e.getSQLState())) {
-                System.out.println(Color.YELLOW + e.getMessage() + Color.RESET);
+                System.out.println(Color.YELLOW+ e.getMessage() + Color.RESET);
             } else {
                 System.out.println(Color.RED + "Lỗi khi xóa học viên: " + e.getMessage() + Color.RESET);
             }
             return false;
         }
     }
+
 
     @Override
     public List<Student> getPageData(int page, int size) {

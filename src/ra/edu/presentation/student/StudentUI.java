@@ -28,15 +28,23 @@ public class StudentUI {
         EnrollmentServiceImp enrollmentServiceImp = new EnrollmentServiceImp();
         boolean continueProgram = true;
         do {
-            System.out.println(Color.MAGENTA + "=== STUDENT UI ===" + Color.RESET);
-            System.out.println(Color.YELLOW + "1. Xem danh sách khóa học" + Color.RESET);
-            System.out.println(Color.YELLOW + "2. Tìm kiếm khóa học theo tên" + Color.RESET);
-            System.out.println(Color.YELLOW + "3. Đăng ký khóa học" + Color.RESET);
-            System.out.println(Color.YELLOW + "4. Xem khóa học đã đăng ký" + Color.RESET);
-            System.out.println(Color.YELLOW + "5. Sắp xếp khóa học theo tên/ ngày đăng ký - tăng dần / giảm dần " + Color.RESET);
-            System.out.println(Color.YELLOW + "6. Hủy đăng ký khóa học" + Color.RESET);
-            System.out.println(Color.YELLOW + "7. Đổi mật khẩu tài khoản" + Color.RESET);
-            System.out.println(Color.RED + "8. Đăng xuất" + Color.RESET);
+
+            System.out.println(Color.CYAN + "================================ STUDENT UI =================================" + Color.RESET);
+            System.out.println(Color.CYAN + "╔════════════╦═══════════════════════════════════════════════════════════════╗");
+            System.out.printf("║ %-10s ║ %-61s ║\n", "Lựa chọn", "Mô tả");
+            System.out.println("╠════════════╬═══════════════════════════════════════════════════════════════╣");
+
+            System.out.printf("║ %-10s ║ %-61s ║\n", "1", "Xem danh sách khóa học");
+            System.out.printf("║ %-10s ║ %-61s ║\n", "2", "Tìm kiếm khóa học theo tên");
+            System.out.printf("║ %-10s ║ %-61s ║\n", "3", "Đăng ký khóa học");
+            System.out.printf("║ %-10s ║ %-61s ║\n", "4", "Xem khóa học đã đăng ký");
+            System.out.printf("║ %-10s ║ %-61s ║\n", "5", "Sắp xếp khóa học theo tên/ ngày đăng ký - tăng dần / giảm dần");
+            System.out.printf("║ %-10s ║ %-61s ║\n", "6", "Hủy đăng ký khóa học");
+            System.out.printf("║ %-10s ║ %-61s ║\n", "7", "Đổi mật khẩu tài khoản");
+            System.out.printf("║ %-10s ║ %-61s ║\n", "8", "Đăng xuất");
+
+            System.out.println("╚════════════╩═══════════════════════════════════════════════════════════════╝" + Color.RESET);
+
             int choice = Validator.validateInteger(Color.MAGENTA + "Chọn tùy chọn: " + Color.RESET,MainApplication.sc);
 
             switch (choice) {
@@ -80,65 +88,89 @@ public class StudentUI {
         try {
             while (continueList) {
                 PageInfo<Course> pageInfo = courseServiceImp.getPageData(currentPage, pageSize);
-
                 List<Course> courses = pageInfo.getRecords();
+                int totalPages = pageInfo.getTotalPages();
 
-                System.out.println(Color.MAGENTA + "\n--- Danh sách khóa học (Trang " + pageInfo.getCurrentPage() + "/" + pageInfo.getTotalPages() + ") --- Tổng " + pageInfo.getTotalRecords() + " khóa học" + Color.RESET);
+                System.out.println(Color.MAGENTA + "\n--- Danh sách khóa học (Trang " + pageInfo.getCurrentPage() + "/" + totalPages + ") --- Tổng " + pageInfo.getTotalRecords() + " khóa học" + Color.RESET);
 
                 if (courses.isEmpty()) {
                     System.out.println(Color.RED + "Không có khóa học nào ở trang này." + Color.RESET);
                 } else {
-                    System.out.printf(Color.CYAN + "%-5s | %-30s | %-10s | %-25s | %-12s\n" + Color.RESET,
-                            "ID", "Tên khóa học", "Số buổi", "Giảng viên", "Ngày tạo");
-                    System.out.println(Color.YELLOW + "----------------------------------------------------------------------" + Color.RESET);
+                    System.out.println(Color.BLUE + "╔════════╦══════════════════════════════════════╦══════════════╦════════════════════════╦══════════════════════╗" + Color.RESET);
+                    System.out.printf(Color.YELLOW + "║ %-6s ║ %-36s ║ %-12s ║ %-22s ║ %-20s ║\n" + Color.RESET,
+                            "ID", "Tên khóa học", "Thời gian", "Giảng viên", "Ngày tạo");
+                    System.out.println(Color.BLUE + "╠════════╬══════════════════════════════════════╬══════════════╬════════════════════════╬══════════════════════╣" + Color.RESET);
 
                     for (Course course : courses) {
-                        System.out.printf(Color.WHITE + "%-5d | %-30s | %-10d | %-25s | %-12s\n" + Color.RESET,
-                                course.getId(), course.getName(), course.getDuration(),
-                                course.getInstructor(), course.getCreateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                        System.out.printf(Color.WHITE + "║ %-6d ║ %-36s ║ %-12s ║ %-22s ║ %-20s ║\n" + Color.RESET,
+                                course.getId(), course.getName(), course.getDuration(), course.getInstructor(), course.getCreateAt());
                     }
+
+                    System.out.println(Color.BLUE + "╚════════╩══════════════════════════════════════╩══════════════╩════════════════════════╩══════════════════════╝" + Color.RESET);
                 }
 
-                System.out.println(Color.MAGENTA + "\n== Tùy chọn điều hướng ==" + Color.RESET);
-                System.out.println(Color.YELLOW + "1. Trang tiếp" + Color.RESET);
-                System.out.println(Color.YELLOW + "2. Trang trước" + Color.RESET);
-                System.out.println(Color.YELLOW + "3. Đến trang cụ thể" + Color.RESET);
-                System.out.println(Color.YELLOW + "4. Quay lại menu chính" + Color.RESET);
-                int choiceInput = Validator.validateInteger(Color.MAGENTA + "Lựa chọn: " + Color.RESET,sc);
-                switch (choiceInput) {
-                    case 1:
-                        if (currentPage < pageInfo.getTotalPages()) {
-                            currentPage++;
+                if (totalPages > 1) {
+                    System.out.println(Color.MAGENTA + "\nChọn trang (gõ số trang / 0: quay lại menu chính)" + Color.RESET);
+                    System.out.print(Color.YELLOW + "Trang: " + Color.RESET);
+
+                    for (int i = 1; i <= totalPages; i++) {
+                        if (i == currentPage) {
+                            System.out.print(Color.GREEN + "[" + i + "] " + Color.RESET);
                         } else {
-                            System.out.println(Color.RED + "Bạn đang ở trang cuối cùng." + Color.RESET);
+                            System.out.print(Color.GRAY + i + " " + Color.RESET);
                         }
-                        break;
-                    case 2:
-                        if (currentPage > 1) {
-                            currentPage--;
-                        } else {
-                            System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
-                        }
-                        break;
-                    case 3:
-                        System.out.print(Color.WHITE + "Nhập số trang (1 - " + pageInfo.getTotalPages() + "): " + Color.RESET);
-                        try {
-                            int targetPage = Integer.parseInt(sc.nextLine());
-                            if (targetPage >= 1 && targetPage <= pageInfo.getTotalPages()) {
-                                currentPage = targetPage;
+                    }
+
+                    if (currentPage < totalPages) {
+                        System.out.print(Color.CYAN + " / n: next" + Color.RESET);
+                    }
+                    if (currentPage > 1) {
+                        System.out.print(Color.CYAN + " / p: prev" + Color.RESET);
+                    }
+
+                    String choice = Validator.validateNonEmptyString("\n" + Color.CYAN + "Nhập lựa chọn: " + Color.RESET, sc);
+
+                    switch (choice) {
+                        case "n":
+                            if (currentPage < totalPages) {
+                                currentPage++;
                             } else {
-                                System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                                System.out.println(Color.RED + "Bạn đang ở trang cuối cùng." + Color.RESET);
                             }
-                        } catch (NumberFormatException e) {
-                            System.out.println(Color.RED + "Vui lòng nhập số nguyên." + Color.RESET);
-                        }
-                        break;
-                    case 4:
+                            break;
+                        case "p":
+                            if (currentPage > 1) {
+                                currentPage--;
+                            } else {
+                                System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
+                            }
+                            break;
+                        case "0":
+                            System.out.println(Color.YELLOW + "Quay lại menu chính..." + Color.RESET);
+                            continueList = false;
+                            break;
+                        default:
+                            try {
+                                int page = Integer.parseInt(choice);
+                                if (page >= 1 && page <= totalPages) {
+                                    currentPage = page;
+                                } else {
+                                    System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println(Color.RED + "Lựa chọn không hợp lệ. Nhập số trang hoặc n / p / 0." + Color.RESET);
+                            }
+                            break;
+                    }
+                } else {
+                    System.out.println(Color.MAGENTA + "\nChọn 0 để quay lại menu chính." + Color.RESET);
+                    String choice = sc.nextLine().trim().toLowerCase();
+                    if (choice.equals("0")) {
+                        System.out.println(Color.YELLOW + "Quay lại menu chính..." + Color.RESET);
                         continueList = false;
-                        System.out.println(Color.YELLOW + "Đã quay lại menu chính." + Color.RESET);
-                        break;
-                    default:
+                    } else {
                         System.out.println(Color.RED + "Lựa chọn không hợp lệ." + Color.RESET);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -148,75 +180,101 @@ public class StudentUI {
     }
 
     public static void searchCourseByName(Scanner sc, CourseServiceImp courseServiceImp) {
-        String keyword = Validator.validateNonEmptyString(Color.WHITE + "Nhập tên khóa học cần tìm: " + Color.RESET,sc);
+        String keyword = Validator.validateNonEmptyString(Color.WHITE + "Nhập tên khóa học cần tìm: " + Color.RESET, sc);
 
         int currentPage = 1;
-        int pageSize = 5;
+        int pageSize = CourseValidator.validatePageSize(sc);
         boolean continueSearch = true;
 
         try {
             while (continueSearch) {
                 PageInfo<Course> pageInfo = courseServiceImp.searchByName(keyword, currentPage, pageSize);
                 List<Course> courses = pageInfo.getRecords();
+                int totalPages = pageInfo.getTotalPages();
 
-                System.out.println(Color.MAGENTA + "\n--- Kết quả tìm kiếm (Trang " + pageInfo.getCurrentPage() + "/" + pageInfo.getTotalPages() + ") --- Tổng " + pageInfo.getTotalRecords() + " khóa học" + Color.RESET);
+                System.out.println(Color.BLUE + "╔══════════════════════════════════════════════════════════════════════════════════════════════════════════╗" + Color.RESET);
+                System.out.printf(Color.YELLOW + "║ %-104s ║\n" + Color.RESET,
+                        "KẾT QUẢ TÌM KIẾM TỪ KHÓA '" + keyword + "' - Trang " + currentPage + "/" + totalPages +
+                                " (Tổng cộng: " + pageInfo.getTotalRecords() + " khóa học)");
+                System.out.println(Color.BLUE + "╠═════╦════════════════════════════════════════════╦══════════╦═══════════════════════════════╦════════════╣" + Color.RESET);
+                System.out.printf(Color.CYAN + "║ %-3s ║ %-42s ║ %-8s ║ %-29s ║ %-10s ║\n" + Color.RESET,
+                        "ID", "Tên khóa học", "Số buổi", "Giảng viên", "Ngày tạo");
+                System.out.println(Color.BLUE + "╠═════╬════════════════════════════════════════════╬══════════╬═══════════════════════════════╬════════════╣" + Color.RESET);
 
                 if (courses.isEmpty()) {
-                    System.out.println(Color.RED + "Không tìm thấy khóa học nào với tên chứa: " + keyword + Color.RESET);
+                    System.out.printf(Color.RED + "║ %-104s ║\n" + Color.RESET, "Không tìm thấy khóa học nào với tên chứa: " + keyword);
                 } else {
-                    System.out.printf(Color.CYAN + "%-5s | %-30s | %-10s | %-25s | %-12s\n" + Color.RESET,
-                            "ID", "Tên khóa học", "Số buổi", "Giảng viên", "Ngày tạo");
-                    System.out.println(Color.YELLOW + "----------------------------------------------------------------------" + Color.RESET);
-
                     for (Course course : courses) {
-                        System.out.printf(Color.WHITE + "%-5d | %-30s | %-10d | %-25s | %-12s\n" + Color.RESET,
+                        System.out.printf(Color.WHITE + "║ %-3d ║ %-42s ║ %-8d ║ %-29s ║ %-10s ║\n" + Color.RESET,
                                 course.getId(), course.getName(), course.getDuration(),
                                 course.getInstructor(), course.getCreateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
                     }
                 }
 
-                System.out.println(Color.MAGENTA + "\n== Tùy chọn điều hướng ==" + Color.RESET);
-                System.out.println(Color.YELLOW + "1. Trang tiếp" + Color.RESET);
-                System.out.println(Color.YELLOW + "2. Trang trước" + Color.RESET);
-                System.out.println(Color.YELLOW + "3. Đến trang cụ thể" + Color.RESET);
-                System.out.println(Color.YELLOW + "4. Quay lại menu chính" + Color.RESET);
-                System.out.print(Color.MAGENTA + "Lựa chọn: " + Color.RESET);
+                System.out.println(Color.BLUE + "╚═════╩════════════════════════════════════════════╩══════════╩═══════════════════════════════╩════════════╝" + Color.RESET);
 
-                String choiceInput = sc.nextLine();
-                switch (choiceInput) {
-                    case "1":
-                        if (currentPage < pageInfo.getTotalPages()) {
-                            currentPage++;
+                if (totalPages > 1) {
+                    System.out.println(Color.MAGENTA + "\nChọn trang (gõ số trang / 0: quay lại menu chính)" + Color.RESET);
+                    System.out.print(Color.YELLOW + "Trang: " + Color.RESET);
+
+                    for (int i = 1; i <= totalPages; i++) {
+                        if (i == currentPage) {
+                            System.out.print(Color.GREEN + "[" + i + "] " + Color.RESET);
                         } else {
-                            System.out.println(Color.RED + "Bạn đang ở trang cuối cùng." + Color.RESET);
+                            System.out.print(Color.GRAY + i + " " + Color.RESET);
                         }
-                        break;
-                    case "2":
-                        if (currentPage > 1) {
-                            currentPage--;
-                        } else {
-                            System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
-                        }
-                        break;
-                    case "3":
-                        System.out.print(Color.WHITE + "Nhập số trang (1 - " + pageInfo.getTotalPages() + "): " + Color.RESET);
-                        try {
-                            int targetPage = Integer.parseInt(sc.nextLine());
-                            if (targetPage >= 1 && targetPage <= pageInfo.getTotalPages()) {
-                                currentPage = targetPage;
+                    }
+
+                    if (currentPage < totalPages) {
+                        System.out.print(Color.CYAN + " / n: next" + Color.RESET);
+                    }
+                    if (currentPage > 1) {
+                        System.out.print(Color.CYAN + " / p: prev" + Color.RESET);
+                    }
+
+                    String choice = Validator.validateNonEmptyString("\n" + Color.CYAN + "Nhập lựa chọn: " + Color.RESET, sc).toLowerCase();
+
+                    switch (choice) {
+                        case "n":
+                            if (currentPage < totalPages) {
+                                currentPage++;
                             } else {
-                                System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                                System.out.println(Color.RED + "Bạn đang ở trang cuối cùng." + Color.RESET);
                             }
-                        } catch (NumberFormatException e) {
-                            System.out.println(Color.RED + "Vui lòng nhập số nguyên." + Color.RESET);
-                        }
-                        break;
-                    case "4":
+                            break;
+                        case "p":
+                            if (currentPage > 1) {
+                                currentPage--;
+                            } else {
+                                System.out.println(Color.RED + "Bạn đang ở trang đầu tiên." + Color.RESET);
+                            }
+                            break;
+                        case "0":
+                            continueSearch = false;
+                            System.out.println(Color.YELLOW + "Đã quay lại menu chính." + Color.RESET);
+                            break;
+                        default:
+                            try {
+                                int page = Integer.parseInt(choice);
+                                if (page >= 1 && page <= totalPages) {
+                                    currentPage = page;
+                                } else {
+                                    System.out.println(Color.RED + "Số trang không hợp lệ." + Color.RESET);
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println(Color.RED + "Lựa chọn không hợp lệ. Nhập số trang hoặc n / p / 0." + Color.RESET);
+                            }
+                            break;
+                    }
+                } else {
+                    System.out.println(Color.MAGENTA + "\nChọn 0 để quay lại menu chính." + Color.RESET);
+                    String choice = sc.nextLine().trim().toLowerCase();
+                    if (choice.equals("0")) {
+                        System.out.println(Color.YELLOW + "Quay lại menu chính..." + Color.RESET);
                         continueSearch = false;
-                        System.out.println(Color.YELLOW + "Đã quay lại menu chính." + Color.RESET);
-                        break;
-                    default:
+                    } else {
                         System.out.println(Color.RED + "Lựa chọn không hợp lệ." + Color.RESET);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -498,57 +556,61 @@ public class StudentUI {
         System.out.println(Color.MAGENTA + "\n=== ĐỔI MẬT KHẨU ===" + Color.RESET);
 
         Account currentAccount = MainApplication.currentUser;
-        String email = currentAccount.getEmail();
 
-        // Kiểm tra mật khẩu cũ cho đến khi đúng
+        String inputEmail;
+        while (true) {
+            inputEmail = Validator.validateNonEmptyString(Color.WHITE + "Nhập email của bạn để xác nhận: " + Color.RESET,sc);
+
+            if (inputEmail.equalsIgnoreCase(currentAccount.getEmail())) {
+                break;
+            } else {
+                System.out.println(Color.RED + "Email không khớp với tài khoản hiện tại. Vui lòng thử lại." + Color.RESET);
+            }
+        }
+
         String oldPassword;
         while (true) {
             oldPassword = Validator.validatePassword(Color.WHITE + "Nhập mật khẩu cũ: " + Color.RESET, sc);
-            if (studentServiceImp.checkOldPassword(email, oldPassword)) {
-                break;  // Nếu mật khẩu cũ đúng, thoát vòng lặp
+            if (studentServiceImp.checkOldPassword(inputEmail, oldPassword)) {
+                break;
             } else {
                 System.out.println(Color.RED + "Mật khẩu cũ không đúng. Vui lòng thử lại." + Color.RESET);
             }
         }
 
         String newPassword;
-        // Kiểm tra mật khẩu mới cho đến khi hợp lệ
         while (true) {
             newPassword = Validator.validateNewPassword(Color.WHITE + "Nhập mật khẩu mới: " + Color.RESET, sc);
 
-            // Kiểm tra mật khẩu mới không được trùng với mật khẩu cũ
             if (oldPassword.equals(newPassword)) {
-                System.out.println(Color.RED + "Mật khẩu mới không được trùng với mật khẩu cũ. Vui lòng chọn mật khẩu khác." + Color.RESET);
-                continue;  // Yêu cầu nhập lại mật khẩu mới
+                System.out.println(Color.RED + "Mật khẩu mới không được trùng với mật khẩu cũ." + Color.RESET);
+                continue;
             }
 
-            // Kiểm tra độ mạnh của mật khẩu mới
             if (!StudentValidator.isStrongPassword(newPassword)) {
-                System.out.println(Color.RED + "Mật khẩu mới không đủ mạnh. Vui lòng chọn mật khẩu có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, và số." + Color.RESET);
-                continue;  // Yêu cầu nhập lại mật khẩu mới
+                System.out.println(Color.RED + "Mật khẩu mới phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số." + Color.RESET);
+                continue;
             }
 
-            // Nếu mật khẩu mới hợp lệ, thoát khỏi vòng lặp
             break;
         }
 
-        // Xác nhận mật khẩu mới
         String confirmPassword;
         while (true) {
             confirmPassword = Validator.validatePassword(Color.WHITE + "Xác nhận mật khẩu mới: " + Color.RESET, sc);
             if (newPassword.equals(confirmPassword)) {
-                break;  // Nếu mật khẩu xác nhận khớp, thoát vòng lặp
+                break;
             } else {
-                System.out.println(Color.RED + "Xác nhận mật khẩu không khớp với mật khẩu mới. Vui lòng nhập lại." + Color.RESET);
+                System.out.println(Color.RED + "Mật khẩu xác nhận không khớp. Vui lòng nhập lại." + Color.RESET);
             }
         }
 
-        // Thực hiện thay đổi mật khẩu
-        boolean success = studentServiceImp.changePassword(email, oldPassword, newPassword);
+        boolean success = studentServiceImp.changePassword(inputEmail, oldPassword, newPassword);
         if (success) {
             System.out.println(Color.GREEN + "Đổi mật khẩu thành công!" + Color.RESET);
         } else {
-            System.out.println(Color.RED + "Đổi mật khẩu thất bại. Vui lòng kiểm tra mật khẩu cũ hoặc yêu cầu về độ mạnh của mật khẩu mới." + Color.RESET);
+            System.out.println(Color.RED + "Đổi mật khẩu thất bại. Vui lòng thử lại." + Color.RESET);
         }
     }
+
 }

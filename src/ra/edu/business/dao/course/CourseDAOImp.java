@@ -76,7 +76,7 @@ public class CourseDAOImp implements CourseDAO {
             return rowsAffected > 0;
 
         } catch (SQLException e) {
-            System.out.println(Color.RED + "Lỗi khi chèn khóa học: " + e.getMessage() + Color.RESET);
+            System.out.println(Color.RED + "Lỗi khi thêm khóa học: " + e.getMessage() + Color.RESET);
             return false;
         }
     }

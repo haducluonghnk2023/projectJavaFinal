@@ -82,11 +82,20 @@ public class StudentValidator {
             } else if (!isValidEmailFormat(email)) {
                 System.out.println("Email không hợp lệ. Vui lòng nhập lại.");
             } else if (isEmailExists(email, studentList)) {
-                System.out.println("Email này đã tồn tại trong hệ thống. Vui lòng nhập lại.");
+                System.out.println(Color.RED + "Email này đã tồn tại trong hệ thống. Vui lòng chọn email khác." + Color.RESET);
             } else {
                 return email;
             }
         }
+    }
+
+    private static boolean isEmailExists(String email, List<Student> studentList) {
+        for (Student student : studentList) {
+            if (student.getEmail().equalsIgnoreCase(email)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isValidEmailFormat(String email) {
@@ -94,17 +103,6 @@ public class StudentValidator {
         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
         return email.matches(emailRegex);
     }
-
-    public static boolean isEmailExists(String email, List<Student> studentList) {
-        // Kiểm tra nếu email đã tồn tại trong danh sách sinh viên
-        for (Student student : studentList) {
-            if (student.getEmail().equals(email)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 
     public static boolean validateSex(String message, Scanner sc) {
         while (true) {

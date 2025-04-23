@@ -3,7 +3,9 @@ package ra.edu.presentation.auth;
 import ra.edu.MainApplication;
 import ra.edu.business.model.account.Account;
 import ra.edu.business.model.account.Status;
+import ra.edu.business.model.student.Student;
 import ra.edu.business.service.auth.AuthServiceImp;
+import ra.edu.business.service.student.StudentServiceImp;
 import ra.edu.exception.login.AppException;
 import ra.edu.presentation.admin.AdminUI;
 import ra.edu.presentation.student.StudentUI;
@@ -32,12 +34,20 @@ public class AuthUI {
 
                 switch (account.getRole()) {
                     case ADMIN:
-                        System.out.println(Color.GREEN + "Chào mừng Admin!" + Color.RESET);
+                        System.out.println(Color.GREEN + "Chào mừng quản trị viên Admin!" + Color.RESET);
                         AdminUI.displayMenuAdmin();
                         break;
 
                     case STUDENT:
-                        System.out.println(Color.GREEN + "Chào mừng Student!" + Color.RESET);
+                        StudentServiceImp studentServiceImp = new StudentServiceImp();
+                        Student student = studentServiceImp.getById(account.getStudent_id());
+
+                        if (student != null) {
+                            System.out.printf(Color.GREEN + "Chào mừng học viên %s!" + Color.RESET + "\n", student.getName());
+                        } else {
+                            System.out.println(Color.YELLOW + "Không tìm thấy thông tin học viên." + Color.RESET);
+                        }
+
                         StudentUI.displayMenuStudent();
                         break;
 
@@ -51,7 +61,6 @@ public class AuthUI {
             }
         }
     }
-
 
     public static void logout() {
         AuthServiceImp authService = new AuthServiceImp();
