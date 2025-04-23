@@ -2,12 +2,10 @@ package ra.edu.business.dao.course;
 
 import ra.edu.business.config.ConnectionDB;
 import ra.edu.business.model.course.Course;
+import ra.edu.exception.login.AppException;
 import ra.edu.utils.Color;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -273,9 +271,13 @@ public class CourseDAOImp implements CourseDAO {
             return rowsAffected > 0;
 
         } catch (SQLException e) {
-            System.err.println(Color.RED + "Lỗi khi đăng ký khóa học cho học viên: " + e.getMessage() + Color.RESET);
+            String message = e.getMessage();
+            if (message != null && message.contains("Sinh viên đã đăng ký")) {
+                System.out.println(Color.YELLOW + message + Color.RESET);
+            } else {
+                System.err.println(Color.RED + "Đã xảy ra lỗi hệ thống khi đăng ký khóa học. Vui lòng thử lại sau." + Color.RESET);
+            }
             return false;
         }
     }
-
 }

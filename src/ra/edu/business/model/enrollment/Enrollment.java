@@ -1,5 +1,7 @@
 package ra.edu.business.model.enrollment;
 
+import ra.edu.business.model.course.Course;
+
 import java.time.LocalDateTime;
 
 public class Enrollment {
@@ -10,6 +12,7 @@ public class Enrollment {
     private Status status;
     private String courseName;
     private String studentName;
+    private Course course;
 
     public Enrollment() {
         this.status = Status.WAITING;
@@ -24,6 +27,14 @@ public class Enrollment {
         this.status = status;
         this.courseName = courseName;
         this.studentName = studentName;
+    }
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
     }
 
     public String getStudentName() {

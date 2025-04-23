@@ -200,56 +200,57 @@ public class EnrollmentDAOImp implements  EnrollmentDAO {
     @Override
     public PageInfo<Enrollment> getStudentsByCoursePaginated(int courseId, int page, int pageSize) {
         List<Enrollment> enrollments = new ArrayList<>();
-        String sql = "{CALL get_students_by_course_paginated(?, ?, ?)}"; // Gọi procedure lấy danh sách sinh viên
         int totalRecords = 0;
+        int totalPages;
 
-        try (Connection conn = ConnectionDB.openConnection();
-             CallableStatement callSt = conn.prepareCall(sql)) {
+        String dataSql = "{CALL get_students_by_course_paginated(?, ?, ?)}";
+        String countSql = "{CALL get_enrollment_count_by_course(?, ?)}";
 
-            callSt.setInt(1, courseId);
-            callSt.setInt(2, page);
-            callSt.setInt(3, pageSize);
+        try (Connection conn = ConnectionDB.openConnection()) {
+            // 1. Lấy dữ liệu phân trang
+            try (CallableStatement stmt = conn.prepareCall(dataSql)) {
+                stmt.setInt(1, courseId);
+                stmt.setInt(2, page);
+                stmt.setInt(3, pageSize);
 
-            // Thực thi truy vấn lấy danh sách sinh viên
-            ResultSet rs = callSt.executeQuery();
-            while (rs.next()) {
-                Enrollment e = new Enrollment();
-                e.setStudentId(rs.getInt("student_id"));
-                e.setCourseId(courseId);
-                e.setCourseName(rs.getString("course_name"));
-                e.setRegisteredAt(rs.getTimestamp("registered_at").toLocalDateTime());
-                e.setStatus(Status.valueOf(rs.getString("status").toUpperCase()));
-                e.setStudentName(rs.getString("student_name"));
-
-                enrollments.add(e);
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    Enrollment e = new Enrollment();
+                    e.setStudentId(rs.getInt("student_id"));
+                    e.setCourseId(courseId);
+                    e.setStudentName(rs.getString("student_name"));
+                    e.setCourseName(rs.getString("course_name"));
+                    e.setRegisteredAt(rs.getTimestamp("registered_at").toLocalDateTime());
+                    e.setStatus(Status.valueOf(rs.getString("status").toUpperCase()));
+                    enrollments.add(e);
+                }
             }
 
-            // Gọi stored procedure để lấy tổng số bản ghi
-            String countSql = "{CALL get_enrollment_count_by_course(?, ?)}"; // Gọi procedure lấy tổng số bản ghi
+            // 2. Lấy tổng số bản ghi của khóa học
             try (CallableStatement countStmt = conn.prepareCall(countSql)) {
                 countStmt.setInt(1, courseId);
-                countStmt.registerOutParameter(2, Types.INTEGER); // Đăng ký tham số OUT
-
+                countStmt.registerOutParameter(2, Types.INTEGER);
                 countStmt.execute();
-                totalRecords = countStmt.getInt(2); // Lấy kết quả từ tham số OUT
+                totalRecords = countStmt.getInt(2);
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        // Tính toán tổng số trang
-        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+        totalPages = (int) Math.ceil((double) totalRecords / pageSize);
 
-        // Tạo và trả về PageInfo
+        // 3. Gói dữ liệu vào PageInfo để trả về
         PageInfo<Enrollment> pageInfo = new PageInfo<>();
-        pageInfo.setRecords(enrollments);
+        pageInfo.setCurrentPage(page);
+        pageInfo.setPageSize(pageSize);
         pageInfo.setTotalRecords(totalRecords);
         pageInfo.setTotalPages(totalPages);
-        pageInfo.setCurrentPage(page);
+        pageInfo.setRecords(enrollments);
 
         return pageInfo;
     }
+
 
     @Override
     public boolean updateEnrollmentStatus(int enrollmentId, String status) {
@@ -337,6 +338,21 @@ public class EnrollmentDAOImp implements  EnrollmentDAO {
         }
     }
 
+    @Override
+    public int countConfirmedStudents() {
+        String sql = "{CALL GetTotalConfirmedStudents(?)}";
+
+        try (Connection conn = ConnectionDB.openConnection();
+             CallableStatement callSt = conn.prepareCall(sql)) {
+
+            callSt.registerOutParameter(1, Types.INTEGER);
+            callSt.execute();
+
+            return callSt.getInt(1);
+        } catch (SQLException e) {
+            throw new AppException("Lỗi khi đếm học viên đã xác nhận", e);
+        }
+    }
 
     @Override
     public List<Enrollment> findAll() {

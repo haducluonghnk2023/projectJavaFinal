@@ -269,6 +269,7 @@ public class StudentUI {
     public static void viewRegisteredCourses(Scanner sc, EnrollmentServiceImp enrollmentServiceImp) {
         CourseServiceImp courseServiceImp = new CourseServiceImp();
         Account account = MainApplication.currentUser;
+
         if (account == null) {
             System.out.println(Color.RED + "Bạn chưa đăng nhập." + Color.RESET);
             return;
@@ -276,25 +277,31 @@ public class StudentUI {
 
         StudentServiceImp studentServiceImp = new StudentServiceImp();
         Student student = studentServiceImp.getById(account.getStudent_id());
+
         if (student == null) {
             System.out.println(Color.RED + "Không tìm thấy thông tin sinh viên này." + Color.RESET);
             return;
         }
 
         int studentId = student.getId();
-
         int currentPage = 1;
         int pageSize = 5;
-
         boolean continuePaging = true;
+
         while (continuePaging) {
-            PageInfo<Enrollment> pageInfo = enrollmentServiceImp.getSortedPagedData("registered_at", "DESC", currentPage, pageSize);
+            // Lấy danh sách enrollment theo studentId có phân trang
+            PageInfo<Enrollment> pageInfo = studentServiceImp.getPagedEnrollmentsByStudentId(studentId, currentPage, pageSize);
             List<Enrollment> enrollments = pageInfo.getRecords();
 
             if (enrollments.isEmpty()) {
                 System.out.println(Color.RED + "Bạn chưa đăng ký khóa học nào." + Color.RESET);
-                continuePaging = false;
                 break;
+            }
+
+            // Gán thông tin khóa học vào mỗi enrollment
+            for (Enrollment e : enrollments) {
+                Course course = (Course) courseServiceImp.getById(e.getCourseId());
+                e.setCourse(course);
             }
 
             System.out.println(Color.MAGENTA + "\n--- Danh sách khóa học đã đăng ký (Trang " + pageInfo.getCurrentPage() + "/" + pageInfo.getTotalPages() + ") ---" + Color.RESET);
@@ -302,10 +309,12 @@ public class StudentUI {
                     "ID", "Tên khóa học", "Ngày đăng ký", "Trạng thái");
 
             for (Enrollment enrollment : enrollments) {
-                Course course = (Course) courseServiceImp.getById(enrollment.getCourseId());
+                Course course = enrollment.getCourse();
                 if (course != null) {
                     System.out.printf(Color.WHITE + "%-5d | %-30s | %-12s | %-10s\n" + Color.RESET,
-                            course.getId(), course.getName(), enrollment.getRegisteredAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), enrollment.getStatus());
+                            course.getId(), course.getName(),
+                            enrollment.getRegisteredAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                            enrollment.getStatus());
                 }
             }
 

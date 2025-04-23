@@ -1,6 +1,7 @@
 package ra.edu.business.service.student;
 
 import ra.edu.business.dao.student.StudentDAOImp;
+import ra.edu.business.model.enrollment.Enrollment;
 import ra.edu.business.model.student.Student;
 import ra.edu.utils.PageInfo;
 
@@ -106,6 +107,11 @@ public class StudentServiceImp implements  StudentService {
     public Boolean checkOldPassword(String email, String oldPassword) {
         String result = studentDAOImp.checkOldPassword(email, oldPassword);
         return "SUCCESS".equals(result);
+    }
+
+    @Override
+    public PageInfo<Enrollment> getPagedEnrollmentsByStudentId(int studentId, int page, int pageSize) {
+        return studentDAOImp.getPagedEnrollmentsByStudentId(studentId, page, pageSize);
     }
 
 }

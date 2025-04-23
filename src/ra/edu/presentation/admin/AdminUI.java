@@ -3,10 +3,10 @@ package ra.edu.presentation.admin;
 import ra.edu.MainApplication;
 import ra.edu.business.model.course.Course;
 import ra.edu.business.model.enrollment.Enrollment;
-import ra.edu.business.model.enrollment.Status;
 import ra.edu.business.model.student.Student;
 import ra.edu.business.service.course.CourseServiceImp;
 import ra.edu.business.service.enrollment.EnrollmentServiceImp;
+import ra.edu.business.service.statistic.StatisticServiceImp;
 import ra.edu.business.service.student.StudentServiceImp;
 import ra.edu.presentation.auth.AuthUI;
 import ra.edu.utils.Color;
@@ -15,7 +15,6 @@ import ra.edu.validate.Validator;
 import ra.edu.validate.course.CourseValidator;
 import ra.edu.validate.student.StudentValidator;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
@@ -30,22 +29,22 @@ public class AdminUI {
             System.out.println(Color.YELLOW + "3. Quản lý đăng ký khóa học" + Color.RESET);
             System.out.println(Color.YELLOW + "4. Thống kê" + Color.RESET);
             System.out.println(Color.RED + "5. Đăng xuất" + Color.RESET);
-            String choice = Validator.validateNonEmptyString(Color.MAGENTA + "Chọn tùy chọn: " + Color.RESET,MainApplication.sc);
+            int choice = Validator.validateInteger(Color.MAGENTA + "Chọn tùy chọn: " + Color.RESET,MainApplication.sc);
 
             switch (choice) {
-                case "1":
+                case 1:
                     displayMenuCourse();
                     break;
-                case "2":
+                case 2:
                      displayMenuStudent();
                     break;
-                case "3":
+                case 3:
                     displayMenuRegisterCourse();
                     break;
-                case "4":
+                case 4:
                     displayMenuStatistics();
                     break;
-                case "5":
+                case 5:
                     continueProgram = false;
                     AuthUI.logout();
                     break;
@@ -106,7 +105,6 @@ public class AdminUI {
         try {
             while (continueList) {
                 PageInfo<Course> pageInfo = courseServiceImp.getPageData(currentPage, pageSize);
-
                 List<Course> courses = pageInfo.getRecords();
 
                 System.out.println(Color.MAGENTA + "\n--- Danh sách khóa học (Trang " + pageInfo.getCurrentPage() + "/" + pageInfo.getTotalPages() + ") --- Tổng " + pageInfo.getTotalRecords() + " khóa học" + Color.RESET);
@@ -114,15 +112,19 @@ public class AdminUI {
                 if (courses.isEmpty()) {
                     System.out.println(Color.RED + "Không có khóa học nào ở trang này." + Color.RESET);
                 } else {
-                    System.out.printf(Color.CYAN + "%-5s | %-30s | %-10s | %-25s | %-12s\n" + Color.RESET,
+                    // Hiển thị bảng với khung
+                    System.out.println(Color.YELLOW + "+-----+--------------------------------+------------+-------------------------+--------------+" + Color.RESET);
+                    System.out.printf(Color.CYAN + "| %-3s | %-30s | %-10s | %-25s | %-12s |\n" + Color.RESET,
                             "ID", "Tên khóa học", "Số buổi", "Giảng viên", "Ngày tạo");
-                    System.out.println(Color.YELLOW + "----------------------------------------------------------------------" + Color.RESET);
+                    System.out.println(Color.YELLOW + "+-----+--------------------------------+------------+-------------------------+--------------+" + Color.RESET);
 
                     for (Course course : courses) {
-                        System.out.printf(Color.WHITE + "%-5d | %-30s | %-10d | %-25s | %-12s\n" + Color.RESET,
+                        System.out.printf(Color.WHITE + "| %-3d | %-30s | %-10d | %-25s | %-12s |\n" + Color.RESET,
                                 course.getId(), course.getName(), course.getDuration(),
                                 course.getInstructor(), course.getCreateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
                     }
+
+                    System.out.println(Color.YELLOW + "+-----+--------------------------------+------------+-------------------------+--------------+" + Color.RESET);
                 }
 
                 System.out.println(Color.MAGENTA + "\n== Tùy chọn điều hướng ==" + Color.RESET);
@@ -130,7 +132,8 @@ public class AdminUI {
                 System.out.println(Color.YELLOW + "2. Trang trước" + Color.RESET);
                 System.out.println(Color.YELLOW + "3. Đến trang cụ thể" + Color.RESET);
                 System.out.println(Color.YELLOW + "4. Quay lại menu chính" + Color.RESET);
-                int choiceInput = Validator.validateInteger(Color.MAGENTA + "Lựa chọn: " + Color.RESET,sc);
+                int choiceInput = Validator.validateInteger(Color.MAGENTA + "Lựa chọn: " + Color.RESET, sc);
+
                 switch (choiceInput) {
                     case 1:
                         if (currentPage < pageInfo.getTotalPages()) {
@@ -288,7 +291,7 @@ public class AdminUI {
     }
 
     public static void searchCourseByName(Scanner sc, CourseServiceImp courseServiceImp) {
-        String keyword = Validator.validateNonEmptyString(Color.WHITE + "Nhập tên khóa học cần tìm: " + Color.RESET,sc);
+        String keyword = Validator.validateNonEmptyString(Color.WHITE + "Nhập tên khóa học cần tìm: " + Color.RESET, sc);
 
         int currentPage = 1;
         int pageSize = 5;
@@ -304,15 +307,19 @@ public class AdminUI {
                 if (courses.isEmpty()) {
                     System.out.println(Color.RED + "Không tìm thấy khóa học nào với tên chứa: " + keyword + Color.RESET);
                 } else {
-                    System.out.printf(Color.CYAN + "%-5s | %-30s | %-10s | %-25s | %-12s\n" + Color.RESET,
+                    // Hiển thị bảng với khung
+                    System.out.println(Color.YELLOW + "------------------------------------------------------------" + Color.RESET);
+                    System.out.printf(Color.CYAN + "| %-3s | %-30s | %-10s | %-25s | %-12s |\n" + Color.RESET,
                             "ID", "Tên khóa học", "Số buổi", "Giảng viên", "Ngày tạo");
-                    System.out.println(Color.YELLOW + "----------------------------------------------------------------------" + Color.RESET);
+                    System.out.println(Color.YELLOW + "------------------------------------------------------------" + Color.RESET);
 
                     for (Course course : courses) {
-                        System.out.printf(Color.WHITE + "%-5d | %-30s | %-10d | %-25s | %-12s\n" + Color.RESET,
+                        System.out.printf(Color.WHITE + "| %-3d | %-30s | %-10d | %-25s | %-12s |\n" + Color.RESET,
                                 course.getId(), course.getName(), course.getDuration(),
                                 course.getInstructor(), course.getCreateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
                     }
+
+                    System.out.println(Color.YELLOW + "------------------------------------------------------------" + Color.RESET);
                 }
 
                 System.out.println(Color.MAGENTA + "\n== Tùy chọn điều hướng ==" + Color.RESET);
@@ -382,17 +389,24 @@ public class AdminUI {
                 if (courses.isEmpty()) {
                     System.out.println(Color.RED + "Không có khóa học nào." + Color.RESET);
                 } else {
-                    System.out.printf(Color.CYAN + "%-5s | %-20s | %-10s | %-15s | %-12s\n" + Color.RESET,
+                    // In ra khung bảng
+                    System.out.println(Color.YELLOW + "+-----+----------------------+------------+-----------------+--------------+");
+                    System.out.printf(Color.CYAN + "| %-3s | %-20s | %-10s | %-15s | %-12s |\n" + Color.RESET,
                             "ID", "Tên khóa học", "Số buổi", "Giảng viên", "Ngày tạo");
-                    System.out.println(Color.YELLOW + "----------------------------------------------------------------------" + Color.RESET);
+                    System.out.println(Color.YELLOW + "+-----+----------------------+------------+-----------------+--------------+");
 
+                    // In danh sách khóa học
                     for (Course course : courses) {
-                        System.out.printf(Color.WHITE + "%-5d | %-20s | %-10d | %-15s | %-12s\n" + Color.RESET,
+                        System.out.printf(Color.WHITE + "| %-3d | %-20s | %-10d | %-15s | %-12s |\n" + Color.RESET,
                                 course.getId(), course.getName(), course.getDuration(),
                                 course.getInstructor(), course.getCreateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
                     }
+
+                    // Kết thúc bảng
+                    System.out.println(Color.YELLOW + "+-----+----------------------+------------+-----------------+--------------+" + Color.RESET);
                 }
 
+                // Tùy chọn điều hướng
                 System.out.println(Color.MAGENTA + "\n== Tùy chọn điều hướng ==" + Color.RESET);
                 System.out.println(Color.YELLOW + "1. Trang tiếp" + Color.RESET);
                 System.out.println(Color.YELLOW + "2. Trang trước" + Color.RESET);
@@ -492,7 +506,6 @@ public class AdminUI {
         try {
             while (continueList) {
                 PageInfo<Student> pageInfo = studentServiceImp.getPageData(currentPage, pageSize);
-
                 List<Student> students = pageInfo.getRecords();
 
                 System.out.println(Color.MAGENTA + "\n--- Danh sách sinh viên (Trang " + pageInfo.getCurrentPage() + "/" + pageInfo.getTotalPages() + ") --- Tổng " + pageInfo.getTotalRecords() + " sinh viên" + Color.RESET);
@@ -500,23 +513,32 @@ public class AdminUI {
                 if (students.isEmpty()) {
                     System.out.println(Color.RED + "Không có sinh viên nào ở trang này." + Color.RESET);
                 } else {
-                    System.out.printf(Color.CYAN + "%-5s | %-20s | %-12s | %-18s | %-25s | %-7s | %-12s\n" + Color.RESET,
+                    // Đóng khung bảng
+                    System.out.println(Color.YELLOW + "+-----+----------------------+--------------+--------------------+--------------------------+---------+--------------+");
+                    System.out.printf(Color.CYAN + "| %-3s | %-20s | %-12s | %-18s | %-25s | %-7s | %-12s |\n" + Color.RESET,
                             "ID", "Tên sinh viên", "Ngày sinh", "Email", "Số điện thoại", "Giới tính", "Ngày tạo");
-                    System.out.println(Color.YELLOW + "-----------------------------------------------------------------------------------" + Color.RESET);
+                    System.out.println(Color.YELLOW + "+-----+----------------------+--------------+--------------------+--------------------------+---------+--------------+");
 
+                    // In dữ liệu sinh viên
                     for (Student student : students) {
                         String gender = student.isStatus() ? "Nam" : "Nữ";
-                        System.out.printf(Color.WHITE + "%-5d | %-20s | %-12s | %-18s | %-25s | %-7s | %-12s\n" + Color.RESET,
+                        System.out.printf(Color.WHITE + "| %-3d | %-20s | %-12s | %-18s | %-25s | %-7s | %-12s |\n" + Color.RESET,
                                 student.getId(), student.getName(), student.getBirthday(), student.getEmail(),
                                 student.getPhone(), gender, student.getCreated_at());
                     }
+
+                    // Đóng khung bảng kết thúc
+                    System.out.println(Color.YELLOW + "+-----+----------------------+--------------+--------------------+--------------------------+---------+--------------+" + Color.RESET);
                 }
 
+                // Tùy chọn điều hướng
                 System.out.println(Color.MAGENTA + "\n== Tùy chọn điều hướng ==" + Color.RESET);
                 System.out.println(Color.YELLOW + "1. Trang tiếp" + Color.RESET);
                 System.out.println(Color.YELLOW + "2. Trang trước" + Color.RESET);
                 System.out.println(Color.YELLOW + "3. Đến trang cụ thể" + Color.RESET);
                 System.out.println(Color.YELLOW + "4. Quay lại menu chính" + Color.RESET);
+
+                // Nhận lựa chọn từ người dùng
                 int choiceInput = Validator.validateInteger(Color.MAGENTA + "Lựa chọn: " + Color.RESET, sc);
                 switch (choiceInput) {
                     case 1:
@@ -696,15 +718,16 @@ public class AdminUI {
                 if (students.isEmpty()) {
                     System.out.println(Color.RED + "Không tìm thấy học viên nào với từ khóa: " + keyword + Color.RESET);
                 } else {
-                    System.out.printf(Color.CYAN + "%-5s | %-25s | %-25s | %-15s\n" + Color.RESET,
-                            "ID", "Họ tên", "Email", "Ngày tạo");
-                    System.out.println(Color.YELLOW + "--------------------------------------------------------------------" + Color.RESET);
+                    System.out.println(Color.CYAN + "+-----+--------------------------+--------------------------+-----------------+");
+                    System.out.printf("| %-5s | %-24s | %-24s | %-15s |\n", "ID", "Họ tên", "Email", "Ngày tạo");
+                    System.out.println("+-----+--------------------------+--------------------------+-----------------+");
 
                     for (Student student : students) {
-                        System.out.printf(Color.WHITE + "%-5d | %-25s | %-25s | %-15s\n" + Color.RESET,
-                                student.getId(), student.getName(), student.getEmail(),
-                                student.getCreated_at());
+                        System.out.printf(Color.WHITE + "| %-5d | %-24s | %-24s | %-15s |\n" + Color.RESET,
+                                student.getId(), student.getName(), student.getEmail(), student.getCreated_at());
                     }
+
+                    System.out.println("+-----+--------------------------+--------------------------+-----------------+");
                 }
 
                 System.out.println(Color.MAGENTA + "\n== Tùy chọn điều hướng ==" + Color.RESET);
@@ -774,17 +797,17 @@ public class AdminUI {
                 if (students.isEmpty()) {
                     System.out.println(Color.RED + "Không có sinh viên nào." + Color.RESET);
                 } else {
-                    // Điều chỉnh tiêu đề cột cho phù hợp với bảng sinh viên
-                    System.out.printf(Color.CYAN + "%-5s | %-20s | %-12s | %-20s | %-15s | %-15s | %-10s\n" + Color.RESET,
-                            "ID", "Tên sinh viên", "Ngày sinh", "Email", "Số điện thoại", "Giới tính", "Ngày tạo");
-                    System.out.println(Color.YELLOW + "----------------------------------------------------------------------" + Color.RESET);
+                    System.out.println(Color.CYAN + "+-----+----------------------+--------------+----------------------+-----------------+-----------------+------------+");
+                    System.out.printf("| %-5s | %-20s | %-12s | %-20s | %-15s | %-15s | %-10s |\n", "ID", "Tên sinh viên", "Ngày sinh", "Email", "Số điện thoại", "Giới tính", "Ngày tạo");
+                    System.out.println("+-----+----------------------+--------------+----------------------+-----------------+-----------------+------------+");
 
-                    // Hiển thị thông tin sinh viên
                     for (Student student : students) {
-                        System.out.printf(Color.WHITE + "%-5d | %-20s | %-12s | %-20s | %-15s | %-15s | %-10s\n" + Color.RESET,
+                        System.out.printf(Color.WHITE + "| %-5d | %-20s | %-12s | %-20s | %-15s | %-15s | %-10s |\n" + Color.RESET,
                                 student.getId(), student.getName(), student.getBirthday(),
-                                student.getEmail(), student.getPhone(),student.isStatus(),student.getCreated_at());
+                                student.getEmail(), student.getPhone(), student.isStatus(), student.getCreated_at());
                     }
+
+                    System.out.println("+-----+----------------------+--------------+----------------------+-----------------+-----------------+------------+");
                 }
 
                 System.out.println(Color.MAGENTA + "\n== Tùy chọn điều hướng ==" + Color.RESET);
@@ -842,14 +865,17 @@ public class AdminUI {
         boolean continueProgram = true;
         do {
             System.out.println(Color.MAGENTA + "=== ADMIN UI ===" + Color.RESET);
-            System.out.println(Color.YELLOW + "1. Hiển thị danh sách đăng ký khóa học" + Color.RESET);
-            System.out.println(Color.YELLOW + "2. Duyệt sinh viên đăng ký khóa học" + Color.RESET);
-            System.out.println(Color.YELLOW + "3. Xóa sinh viên khỏi khóa học" + Color.RESET);
-            System.out.println(Color.RED + "4. Thoát" + Color.RESET);
-            System.out.print("Chọn tùy chọn: ");
-            int choice = MainApplication.sc.nextInt();
-            MainApplication.sc.nextLine();
 
+            System.out.println(Color.CYAN + "+------------+------------------------------------------+");
+            System.out.printf("| %-10s | %-40s |\n", "Lựa chọn", "Mô tả");
+            System.out.println("+------------+------------------------------------------+");
+            System.out.printf("| %-10d | %-40s |\n", 1, "Hiển thị danh sách đăng ký khóa học");
+            System.out.printf("| %-10d | %-40s |\n", 2, "Duyệt sinh viên đăng ký khóa học");
+            System.out.printf("| %-10d | %-40s |\n", 3, "Từ chối sinh viên khỏi khóa học");
+            System.out.printf("| %-10d | %-40s |\n", 4, "Thoát");
+            System.out.println("+------------+------------------------------------------+");
+
+            int choice = Validator.validateInteger(Color.MAGENTA + "Chọn tùy chọn: " + Color.RESET,MainApplication.sc);
             switch (choice) {
                 case 1:
                     showStudentsByCoursePaginated(MainApplication.sc, courseServiceImp, enrollmentServiceImp);
@@ -864,7 +890,7 @@ public class AdminUI {
                     continueProgram = false;
                     break;
                 default:
-                    System.out.println("Lựa chọn không hợp lệ. Vui lòng thử lại.");
+                    System.out.println(Color.RED + "Lựa chọn không hợp lệ. Vui lòng thử lại." + Color.RESET);
             }
         } while (continueProgram);
     }
@@ -878,10 +904,13 @@ public class AdminUI {
             return;
         }
 
-        System.out.printf(Color.CYAN + "%-5s | %-30s\n" + Color.RESET, "ID", "Tên khóa học");
+        System.out.println(Color.CYAN + "+-----+-------------------------------+");
+        System.out.printf("| %-5s | %-30s |\n", "ID", "Tên khóa học");
+        System.out.println("+-----+-------------------------------+");
         for (Course c : courses) {
-            System.out.printf("%-5d | %-30s\n", c.getId(), c.getName());
+            System.out.printf("| %-5d | %-30s |\n", c.getId(), c.getName());
         }
+        System.out.println("+-----+-------------------------------+");
 
         int courseId = Validator.validateInteger("Nhập ID khóa học: ", sc);
         int currentPage = 1;
@@ -893,25 +922,27 @@ public class AdminUI {
                 PageInfo<Enrollment> pageInfo = enrollmentServiceImp.getStudentsByCoursePaginated(courseId, currentPage, pageSize);
                 List<Enrollment> enrollments = pageInfo.getRecords();
 
-                System.out.printf(Color.MAGENTA + "\n--- Trang %d/%d --- Tổng cộng %d sinh viên đăng ký ---\n" + Color.RESET,
-                        pageInfo.getCurrentPage(), pageInfo.getTotalPages(), pageInfo.getTotalRecords());
+                System.out.printf(Color.MAGENTA + "\n--- KHÓA HỌC ID: %d - Trang %d/%d ---\nTổng số sinh viên đăng ký: %d\n" + Color.RESET,
+                        courseId, pageInfo.getCurrentPage(), pageInfo.getTotalPages(), pageInfo.getTotalRecords());
 
                 if (enrollments.isEmpty()) {
                     System.out.println(Color.RED + "Không có sinh viên nào ở trang này." + Color.RESET);
                 } else {
-                    System.out.printf(Color.CYAN + "%-10s | %-25s | %-20s | %-15s\n" + Color.RESET,
-                            "Mã SV", "Tên sinh viên", "Ngày đăng ký", "Trạng thái");
+                    System.out.println("+------------+-------------------------+---------------------+-----------------+");
+                    System.out.printf("| %-10s | %-23s | %-19s | %-15s |\n", "Mã SV", "Tên sinh viên", "Ngày đăng ký", "Trạng thái");
+                    System.out.println("+------------+-------------------------+---------------------+-----------------+");
 
                     for (Enrollment e : enrollments) {
-                        System.out.printf("%-10d | %-25s | %-20s | %-15s\n",
+                        System.out.printf("| %-10d | %-23s | %-19s | %-15s |\n",
                                 e.getStudentId(),
                                 e.getStudentName(),
                                 e.getRegisteredAt().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")),
                                 e.getStatus());
                     }
+
+                    System.out.println("+------------+-------------------------+---------------------+-----------------+");
                 }
 
-                // Menu điều hướng
                 System.out.println(Color.MAGENTA + "\n== Tùy chọn điều hướng ==" + Color.RESET);
                 System.out.println(Color.YELLOW + "1. Trang tiếp" + Color.RESET);
                 System.out.println(Color.YELLOW + "2. Trang trước" + Color.RESET);
@@ -971,11 +1002,12 @@ public class AdminUI {
             return;
         }
 
-        // In thông tin các đơn đăng ký
-        System.out.printf(Color.CYAN + "%-10s | %-25s | %-25s | %-20s | %-15s\n" + Color.RESET,
-                "Enroll ID", "Tên sinh viên", "Tên khóa học", "Ngày đăng ký", "Trạng thái");
+        System.out.println(Color.CYAN + "+------------+-------------------------+------------------------+---------------------+-----------------+");
+        System.out.printf("| %-10s | %-23s | %-22s | %-19s | %-15s |\n", "Enroll ID", "Tên sinh viên", "Tên khóa học", "Ngày đăng ký", "Trạng thái");
+        System.out.println("+------------+-------------------------+------------------------+---------------------+-----------------+");
+
         for (Enrollment e : waitingList) {
-            System.out.printf("%-10d | %-25s | %-25s | %-20s | %-15s\n",
+            System.out.printf("| %-10d | %-23s | %-22s | %-19s | %-15s |\n",
                     e.getId(),
                     e.getStudentName(),
                     e.getCourseName(),
@@ -983,9 +1015,10 @@ public class AdminUI {
                     e.getStatus());
         }
 
+        System.out.println("+------------+-------------------------+------------------------+---------------------+-----------------+");
+
         int enrollmentId = Validator.validateInteger("Nhập ID đăng ký (Enrollment ID) cần duyệt: ", sc);
 
-        // Kiểm tra xem ID có tồn tại trong danh sách không
         Enrollment enrollmentToApprove = null;
         for (Enrollment e : waitingList) {
             if (e.getId() == enrollmentId) {
@@ -999,7 +1032,6 @@ public class AdminUI {
             return;
         }
 
-        // Duyệt đơn đăng ký
         boolean success = enrollmentServiceImp.approveEnrollment(enrollmentId);
 
         if (success) {
@@ -1008,7 +1040,6 @@ public class AdminUI {
             System.out.println(Color.RED + "Duyệt thất bại! Chỉ có thể duyệt các đơn có trạng thái 'waiting'." + Color.RESET);
         }
     }
-
 
     public static void rejectStudentEnrollment(Scanner sc, EnrollmentServiceImp enrollmentServiceImp) {
         System.out.println(Color.MAGENTA + "\n=== TỪ CHỐI SINH VIÊN ĐĂNG KÝ KHÓA HỌC ===" + Color.RESET);
@@ -1020,11 +1051,12 @@ public class AdminUI {
             return;
         }
 
-        // In thông tin các đơn đăng ký
-        System.out.printf(Color.CYAN + "%-10s | %-25s | %-25s | %-20s | %-15s\n" + Color.RESET,
-                "Enroll ID", "Tên sinh viên", "Tên khóa học", "Ngày đăng ký", "Trạng thái");
+        System.out.println(Color.CYAN + "+------------+-------------------------+------------------------+---------------------+-----------------+");
+        System.out.printf("| %-10s | %-23s | %-22s | %-19s | %-15s |\n", "Enroll ID", "Tên sinh viên", "Tên khóa học", "Ngày đăng ký", "Trạng thái");
+        System.out.println("+------------+-------------------------+------------------------+---------------------+-----------------+");
+
         for (Enrollment e : waitingList) {
-            System.out.printf("%-10d | %-25s | %-25s | %-20s | %-15s\n",
+            System.out.printf("| %-10d | %-23s | %-22s | %-19s | %-15s |\n",
                     e.getId(),
                     e.getStudentName(),
                     e.getCourseName(),
@@ -1032,9 +1064,10 @@ public class AdminUI {
                     e.getStatus());
         }
 
+        System.out.println("+------------+-------------------------+------------------------+---------------------+-----------------+");
+
         int enrollmentId = Validator.validateInteger("Nhập ID đăng ký (Enrollment ID) cần từ chối: ", sc);
 
-        // Kiểm tra xem ID có tồn tại trong danh sách không
         Enrollment enrollmentToReject = null;
         for (Enrollment e : waitingList) {
             if (e.getId() == enrollmentId) {
@@ -1048,7 +1081,6 @@ public class AdminUI {
             return;
         }
 
-        // Từ chối đơn đăng ký
         boolean success = enrollmentServiceImp.denyEnrollment(enrollmentId);
 
         if (success) {
@@ -1058,8 +1090,9 @@ public class AdminUI {
         }
     }
 
-
     public static void displayMenuStatistics() {
+        StatisticServiceImp courseServiceImp = new StatisticServiceImp();
+        EnrollmentServiceImp enrollmentServiceImp = new EnrollmentServiceImp();
         boolean continueProgram = true;
         do {
             System.out.println(Color.MAGENTA + "=== ADMIN UI ===" + Color.RESET);
@@ -1067,21 +1100,21 @@ public class AdminUI {
             System.out.println(Color.YELLOW + "2. Thống kê tổng số học viên theo từng khóa" + Color.RESET);
             System.out.println(Color.YELLOW + "3. Thống kê top 5 khóa học đông sinh viên nhất" + Color.RESET);
             System.out.println(Color.YELLOW + "4. Liệt kê các khóa học có trên 10 học viên" + Color.RESET);
-            System.out.println(Color.RED + "7. Thoát" + Color.RESET);
-            System.out.print(Color.RESET + "Chọn tùy chọn: " + Color.RESET);
-            int choice = MainApplication.sc.nextInt();
-            MainApplication.sc.nextLine();
+            System.out.println(Color.RED + "5. Thoát" + Color.RESET);
+            int choice = Validator.validateInteger(Color.MAGENTA + "Chọn tùy chọn: " + Color.RESET,MainApplication.sc);
 
             switch (choice) {
                 case 1:
-
+                    statisticStudentAndCourse(courseServiceImp, enrollmentServiceImp);
                     break;
                 case 2:
-
+                    statisticStudentsPerCourse();
                     break;
                 case 3:
+                    statisticTop5Courses();
                     break;
                 case 4:
+                    statisticCoursesWithMoreThan10Students();
                     break;
                 case 5:
                     continueProgram = false;
@@ -1091,4 +1124,85 @@ public class AdminUI {
             }
         } while (continueProgram);
     }
+
+    public static void statisticStudentAndCourse(StatisticServiceImp courseServiceImp, EnrollmentServiceImp enrollmentServiceImp) {
+        System.out.println(Color.MAGENTA + "\n=== THỐNG KÊ TỔNG SỐ LƯỢNG KHÓA HỌC & HỌC VIÊN ===" + Color.RESET);
+
+        int totalCourses = courseServiceImp.getTotalCourseCount();
+        int totalConfirmedStudents = enrollmentServiceImp.countConfirmedStudents();
+
+        System.out.println(Color.CYAN + "\n===== THỐNG KÊ HỆ THỐNG =====" + Color.RESET);
+        System.out.println("Tổng số khóa học      : " + Color.YELLOW + totalCourses + Color.RESET);
+        System.out.println("Tổng số học viên    : " + Color.YELLOW + totalConfirmedStudents + " (đã xác nhận)" + Color.RESET);
+    }
+
+    public static void statisticStudentsPerCourse() {
+        StatisticServiceImp statisticServiceImp = new StatisticServiceImp();
+
+        List<Object[]> courseStats = statisticServiceImp.countStudentsGroupByCourse();
+
+        if (courseStats.isEmpty()) {
+            System.out.println(Color.RED + "Không có khóa học nào có học viên đã xác nhận." + Color.RESET);
+            return;
+        }
+
+        System.out.println(Color.CYAN + "+-----------------------------+------------------+");
+        System.out.printf("| %-27s | %-16s |\n", "Tên khóa học", "Số học viên");
+        System.out.println("+-----------------------------+------------------+");
+
+        for (Object[] stat : courseStats) {
+            String courseName = (String) stat[0];
+            int studentCount = (int) stat[1];
+            System.out.printf("| %-27s | %-16d |\n", courseName, studentCount);
+        }
+
+        System.out.println("+-----------------------------+------------------+");
+    }
+
+    public static void statisticTop5Courses() {
+        StatisticServiceImp statisticServiceImp = new StatisticServiceImp();
+
+        List<Object[]> topCourses = statisticServiceImp.getTop5CoursesByStudentCount();
+
+        if (topCourses.isEmpty()) {
+            System.out.println(Color.RED + "Không có khóa học nào có học viên đã xác nhận." + Color.RESET);
+            return;
+        }
+
+        System.out.println(Color.CYAN + "+-----------------------------+------------------+");
+        System.out.printf("| %-27s | %-16s |\n", "Tên khóa học", "Số học viên");
+        System.out.println("+-----------------------------+------------------+");
+
+        for (Object[] stat : topCourses) {
+            String courseName = (String) stat[0];
+            int studentCount = (int) stat[1];
+            System.out.printf("| %-27s | %-16d |\n", courseName, studentCount);
+        }
+
+        System.out.println("+-----------------------------+------------------+");
+    }
+
+    public static void statisticCoursesWithMoreThan10Students() {
+        StatisticServiceImp statisticServiceImp = new StatisticServiceImp();
+
+        List<Object[]> courses = statisticServiceImp.getCoursesWithMoreThan10Students();
+
+        if (courses.isEmpty()) {
+            System.out.println(Color.RED + "Không có khóa học nào có hơn 10 học viên đã xác nhận." + Color.RESET);
+            return;
+        }
+
+        System.out.println(Color.CYAN + "+-----------------------------+------------------+");
+        System.out.printf("| %-25s | %-16s |\n", "Tên khóa học", "Số học viên");
+        System.out.println("+-----------------------------+------------------+");
+
+        for (Object[] stat : courses) {
+            String courseName = (String) stat[0];
+            int studentCount = (int) stat[1];
+            System.out.printf("| %-25s | %-16d |\n", courseName, studentCount);
+        }
+
+        System.out.println("+-----------------------------+------------------+");
+    }
+
 }

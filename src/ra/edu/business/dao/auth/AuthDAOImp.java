@@ -66,4 +66,24 @@ public class AuthDAOImp implements AuthDAO {
         return null;
     }
 
+    @Override
+    public boolean checkEmailExists(String email) {
+        Connection conn = null;
+        CallableStatement callSt = null;
+        ResultSet rs = null;
+        try {
+            conn = ConnectionDB.openConnection();
+            callSt = conn.prepareCall("{call check_account_email(?)}");
+            callSt.setString(1, email);
+            rs = callSt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("count_email") > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            ConnectionDB.closeConnection(conn, callSt);
+        }
+        return false;
+    }
 }

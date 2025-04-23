@@ -5,6 +5,7 @@ import ra.edu.business.dao.auth.AuthDAOImp;
 import ra.edu.business.model.account.Account;
 import ra.edu.business.model.admin.Admin;
 import ra.edu.business.model.student.Student;
+import ra.edu.exception.login.AppException;
 
 
 public class AuthServiceImp implements AuthService {
@@ -13,21 +14,26 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public Object login(String email, String password) {
-        Account account = authDAO.accountLogin(email, password);
-        if (account != null) {
-            switch (account.getRole()) {
-                case ADMIN:
-                    currentUser = account;
-                    return account;
-                case STUDENT:
-                    currentUser = account;
-                    return account;
-                default:
-                    return null;
-            }
+        boolean emailExists = authDAO.checkEmailExists(email);
+
+        if (!emailExists) {
+            throw new AppException("Email không tồn tại.");
         }
-        return null;
+
+        Account account = authDAO.accountLogin(email, password);
+
+        if (account == null) {
+            throw new AppException("Mật khẩu không chính xác.");
+        }
+
+        if (account.getRole() == null) {
+            throw new AppException("Vai trò tài khoản không hợp lệ.");
+        }
+
+        currentUser = account;
+        return account;
     }
+
 
     @Override
     public void logout() {

@@ -17,4 +17,5 @@ public interface EnrollmentService {
     boolean approveEnrollment(int enrollmentId);
     List<Enrollment> getEnrollmentsByStatus(String status);
     boolean denyEnrollment(int enrollmentId);
+    int countConfirmedStudents();
 }

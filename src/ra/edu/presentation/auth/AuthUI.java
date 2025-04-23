@@ -4,6 +4,7 @@ import ra.edu.MainApplication;
 import ra.edu.business.model.account.Account;
 import ra.edu.business.model.account.Status;
 import ra.edu.business.service.auth.AuthServiceImp;
+import ra.edu.exception.login.AppException;
 import ra.edu.presentation.admin.AdminUI;
 import ra.edu.presentation.student.StudentUI;
 import ra.edu.utils.Color;
@@ -18,15 +19,17 @@ public class AuthUI {
             String email = ra.edu.validate.Validator.validateEmail("Nhập email: ", MainApplication.sc);
             String password = ra.edu.validate.Validator.validatePassword(MainApplication.sc);
 
-            Account account = (Account) authService.login(email, password);
+            try {
+                Account account = (Account) authService.login(email, password);
 
-            if (account == null) {
-                System.out.println(Color.RED + "Đăng nhập không thành công. Vui lòng thử lại!" + Color.RESET);
-            } else if (account.getStatus() != Status.ACTIVE) {
-                System.out.printf(Color.YELLOW + "Tài khoản đang ở trạng thái [%s]. Vui lòng liên hệ quản trị viên.\n" + Color.RESET, account.getStatus());
-            } else {
+                if (account.getStatus() != Status.ACTIVE) {
+                    System.out.printf(Color.YELLOW + "Tài khoản đang ở trạng thái [%s]. Vui lòng liên hệ quản trị viên.\n" + Color.RESET, account.getStatus());
+                    continue;
+                }
+
                 MainApplication.currentUser = account;
                 loggedIn = true;
+
                 switch (account.getRole()) {
                     case ADMIN:
                         System.out.println(Color.GREEN + "Chào mừng Admin!" + Color.RESET);
@@ -42,9 +45,13 @@ public class AuthUI {
                         System.out.println(Color.RED + "Không xác định được vai trò người dùng!" + Color.RESET);
                         break;
                 }
+
+            } catch (AppException e) {
+                System.out.println(Color.RED + e.getMessage() + Color.RESET);
             }
         }
     }
+
 
     public static void logout() {
         AuthServiceImp authService = new AuthServiceImp();

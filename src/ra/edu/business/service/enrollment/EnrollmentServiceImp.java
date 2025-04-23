@@ -88,4 +88,9 @@ public class EnrollmentServiceImp implements  EnrollmentService {
         return enrollmentDAOImp.denyEnrollment(enrollmentId);
     }
 
+    @Override
+    public int countConfirmedStudents() {
+        return enrollmentDAOImp.countConfirmedStudents();
+    }
+
 }

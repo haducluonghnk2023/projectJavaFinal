@@ -107,4 +107,5 @@ public class CourseServiceImp implements CourseService{
     public boolean registerCourseForStudent(int studentId, int courseId) {
         return courseDAOImp.registerCourseForStudent(studentId, courseId);
     }
+
 }

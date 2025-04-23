@@ -9,4 +9,5 @@ import java.time.format.DateTimeFormatter;
 
 public interface AuthDAO extends AppDAO {
     Account accountLogin(String name, String password);
+    boolean checkEmailExists(String email);
 }

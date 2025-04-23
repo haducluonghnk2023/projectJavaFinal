@@ -7,4 +7,5 @@ public interface AuthService {
     void logout();
     boolean isAuthenticated();
     Object  getCurrentStudent();
+
 }

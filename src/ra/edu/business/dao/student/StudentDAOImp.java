@@ -1,9 +1,12 @@
 package ra.edu.business.dao.student;
 
-import com.mysql.cj.jdbc.JdbcConnection;
 import ra.edu.business.config.ConnectionDB;
+import ra.edu.business.model.course.Course;
+import ra.edu.business.model.enrollment.Enrollment;
+import ra.edu.business.model.enrollment.Status;
 import ra.edu.business.model.student.Student;
 import ra.edu.utils.Color;
+import ra.edu.utils.PageInfo;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -304,6 +307,64 @@ public class StudentDAOImp implements StudentDAO{
             e.printStackTrace();
         }
         return result;
+    }
+
+    @Override
+    public PageInfo<Enrollment> getPagedEnrollmentsByStudentId(int studentId, int page, int pageSize) {
+        List<Enrollment> enrollments = new ArrayList<>();
+        int totalRecords = 0;
+        int totalPages;
+
+        String dataSql = "{CALL GetEnrollmentsByStudentIdPaged(?, ?, ?)}";
+        String countSql = "{CALL GetEnrollmentCountByStudentId(?, ?)}";
+
+        try (Connection conn = ConnectionDB.openConnection()) {
+
+            // 1. Gọi procedure lấy dữ liệu phân trang
+            try (CallableStatement stmt = conn.prepareCall(dataSql)) {
+                stmt.setInt(1, studentId);
+                stmt.setInt(2, page);
+                stmt.setInt(3, pageSize);
+
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    Enrollment e = new Enrollment();
+                    e.setCourseId(rs.getInt("course_id"));
+                    e.setRegisteredAt(rs.getTimestamp("registered_at").toLocalDateTime());
+                    e.setStatus(Status.valueOf(rs.getString("status").toUpperCase()));
+
+                    Course course = new Course();
+                    course.setId(rs.getInt("course_id"));
+                    course.setName(rs.getString("course_name"));
+                    e.setCourse(course);
+
+                    enrollments.add(e);
+                }
+            }
+
+            // 2. Gọi procedure lấy tổng số bản ghi
+            try (CallableStatement countStmt = conn.prepareCall(countSql)) {
+                countStmt.setInt(1, studentId);
+                countStmt.registerOutParameter(2, Types.INTEGER);
+                countStmt.execute();
+                totalRecords = countStmt.getInt(2);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+
+        // 3. Trả về đối tượng PageInfo
+        PageInfo<Enrollment> pageInfo = new PageInfo<>();
+        pageInfo.setCurrentPage(page);
+        pageInfo.setPageSize(pageSize);
+        pageInfo.setTotalRecords(totalRecords);
+        pageInfo.setTotalPages(totalPages);
+        pageInfo.setRecords(enrollments);
+
+        return pageInfo;
     }
 
 }

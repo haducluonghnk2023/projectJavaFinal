@@ -65,7 +65,7 @@ VALUES
     ('Mechanical Engineering 101', 50, 'Dr. Steven Evans'),
     ('Electrical Engineering 101', 45, 'Prof. Karen Turner'),
     ('Civil Engineering 101', 50, 'Dr. Robert Carter');
-
+-- Đăng nhập
 DELIMITER //
 
 CREATE PROCEDURE account_login(
@@ -79,8 +79,15 @@ BEGIN
 END //
 
 DELIMITER ;
+-- check email
+DELIMITER //
+CREATE PROCEDURE check_account_email(IN p_email VARCHAR(100))
+BEGIN
+    SELECT COUNT(*) AS count_email FROM accounts WHERE email = p_email;
+END //
+DELIMITER ;
 
--- phan trang khoa học
+-- Lấy danh sách khóa học có phân trang
 DELIMITER $$
 
 CREATE PROCEDURE GetCoursesPaginated(IN page INT, IN pageSize INT)
@@ -98,7 +105,7 @@ END$$
 
 DELIMITER ;
 
--- them moi khoa hoc
+-- Thêm mới khóa học
 DELIMITER $$
 
 CREATE PROCEDURE AddCourse(IN course_name VARCHAR(100), IN course_duration INT, IN course_instructor VARCHAR(100))
@@ -110,7 +117,7 @@ END$$
 
 DELIMITER ;
 
--- cap nhat khoa hoc
+-- Cập nhật khóa học
 DELIMITER $$
 
 CREATE PROCEDURE UpdateCourse(IN course_id INT, IN course_name VARCHAR(100), IN course_duration INT, IN course_instructor VARCHAR(100))
@@ -125,7 +132,7 @@ END$$
 
 DELIMITER ;
 
--- tong
+-- Lấy tổng số khóa học
 DELIMITER $$
 CREATE PROCEDURE GetTotalCourses()
 BEGIN
@@ -138,15 +145,14 @@ BEGIN
     SELECT total AS total_courses;
 END$$
 DELIMITER ;
--- lay theo id
+-- Lấy khóa học theo ID
 DELIMITER //
 CREATE PROCEDURE FindCourseById(IN courseId INT)
 BEGIN
     SELECT * FROM course WHERE id = courseId;
 END //
 DELIMITER ;
--- xoa
-
+-- Xóa khóa học
 DELIMITER //
 
 CREATE PROCEDURE DeleteCourseById(IN p_course_id INT)
@@ -178,7 +184,7 @@ BEGIN
 END //
 
 DELIMITER ;
--- tim kiem
+-- Tìm kiếm khóa học theo tên
 DELIMITER //
 CREATE PROCEDURE SearchCoursesByName(IN keyword VARCHAR(100))
 BEGIN
@@ -187,7 +193,7 @@ BEGIN
 END
 //
 DELIMITER ;
--- sap xep
+-- Săp xếp và phân trang danh sách khóa học
 DELIMITER //
 
 CREATE PROCEDURE GetCoursesSortedPaged(
@@ -213,7 +219,7 @@ END
 //
 DELIMITER ;
 
--- all
+-- Lấy danh sách tất cả khóa học
 DELIMITER $$
 
 CREATE PROCEDURE GetAllCourses()
@@ -224,7 +230,7 @@ END $$
 
 DELIMITER ;
 -- STUDENT
---
+-- Thêm sinh viên mới
 DELIMITER //
 
 CREATE PROCEDURE AddNewStudent(
@@ -260,9 +266,7 @@ BEGIN
 END //
 
 DELIMITER ;
-
--- phan trang
---
+-- Lấy danh sách sinh viên có phân trang
 DELIMITER //
 
 CREATE PROCEDURE GetStudentsPaginated(IN page INT, IN pageSize INT)
@@ -280,7 +284,7 @@ END //
 
 DELIMITER ;
 
--- all
+-- Lấy danh sách sinh viên
 DELIMITER //
 
 CREATE PROCEDURE GetAllStudents()
@@ -290,7 +294,7 @@ BEGIN
 END //
 
 DELIMITER ;
--- delete
+-- Xóa sinh viên
 DELIMITER //
 
 CREATE PROCEDURE deactivate_and_delete_student(IN p_student_id INT)
@@ -311,7 +315,7 @@ END //
 
 DELIMITER ;
 
--- tim kiem
+-- Tìm kiếm sinh viên theo tên, email hoặc ID
 DELIMITER //
 
 CREATE PROCEDURE SearchStudentsByKeyword(IN keyword VARCHAR(100))
@@ -324,7 +328,7 @@ BEGIN
 END //
 
 DELIMITER ;
--- update
+-- Cập nhật thông tin sinh viên
 DELIMITER $$
 
 CREATE PROCEDURE UpdateStudent (
@@ -347,7 +351,7 @@ BEGIN
 END $$
 
 DELIMITER ;
--- find id
+-- Lấy thông tin sinh viên theo ID
 DELIMITER //
 CREATE PROCEDURE FindStudentById(IN studentId INT)
 BEGIN
@@ -367,7 +371,7 @@ BEGIN
     SELECT total AS total_students;
 END$$
 DELIMITER ;
--- sap xep
+-- Săp xếp và phân trang danh sách sinh viên
 DELIMITER //
 
 CREATE PROCEDURE GetStudentsSortedPaged(
@@ -393,8 +397,7 @@ END
 //
 DELIMITER ;
 -- enrollment
--- dang ki khoa hoc
-
+-- Đăng ký khóa học
 DELIMITER //
 
 CREATE PROCEDURE RegisterCourse(IN IN_student_id INT, IN IN_course_id INT)
@@ -412,9 +415,7 @@ BEGIN
 END //
 
 DELIMITER ;
-
-
--- kiem tra da dang ky
+-- Kiểm tra xem sinh viên đã đăng ký khóa học chưa
 DELIMITER //
 
 CREATE PROCEDURE IsCourseAlreadyRegistered(IN student_id INT, IN course_id INT)
@@ -430,8 +431,8 @@ BEGIN
 END //
 
 DELIMITER ;
--- lay danh sach khoa hoc da dang ky
 
+-- Lấy danh sách khóa học đã đăng ký của sinh viên
 DELIMITER //
 
 CREATE PROCEDURE GetCoursesByStudent(IN student_id INT)
@@ -441,8 +442,7 @@ BEGIN
 END //
 
 DELIMITER ;
-
--- kiem tra khoa hoc da dang ky
+-- Kiểm tra các khóa học đã đăng ký
 DELIMITER //
 CREATE PROCEDURE CheckCourseRegistration(IN student_id INT, IN course_id INT)
 BEGIN
@@ -474,7 +474,7 @@ END
 //
 DELIMITER ;
 
--- xem khoa hoc da dang ky
+-- Lấy các khoa học đã đăng ký
 DELIMITER //
 CREATE PROCEDURE GetCoursesForStudent(IN student_id_in INT)
 BEGIN
@@ -487,8 +487,7 @@ END
 //
 DELIMITER ;
 
--- huy dang ki
-
+-- Hủy dăng ký khóa học
 DELIMITER $$
 
 CREATE PROCEDURE CancelEnrollment(
@@ -521,9 +520,7 @@ BEGIN
 END $$
 
 DELIMITER ;
-
-
---
+-- Lấy thông tin sinh viên và khóa học từ bảng đăng ký khóa học
 DELIMITER //
 
 CREATE PROCEDURE GetEnrollmentByStudentAndCourse(IN student_id INT, IN course_id INT)
@@ -533,8 +530,7 @@ BEGIN
 END //
 
 DELIMITER ;
--- sap xep
-
+-- Sap xep va phan trang danh sách đăng ký khóa học
 DELIMITER $$
 
 CREATE PROCEDURE GetEnrollmentsSortedPaged(
@@ -559,7 +555,7 @@ END $$
 
 DELIMITER ;
 
--- tong
+-- Lấy tổng số bản ghi trong bảng enrollment
 DELIMITER $$
 CREATE PROCEDURE GetTotalEnrollments()
 BEGIN
@@ -572,7 +568,7 @@ BEGIN
 END$$
 DELIMITER ;
 -- doi mat khau
--- Procedure đổi mật khẩu
+-- Thay đổi mật khẩu
 DELIMITER //
 CREATE PROCEDURE sp_changePassword(
     IN p_email VARCHAR(50),
@@ -603,7 +599,7 @@ BEGIN
 END //
 DELIMITER ;
 
---
+-- Kiểm tra mật khẩu cũ
 DELIMITER $$
 
 CREATE PROCEDURE CheckOldPassword(IN studentEmail VARCHAR(255), IN oldPassword VARCHAR(255))
@@ -622,9 +618,8 @@ BEGIN
 END $$
 
 DELIMITER ;
-
 -- ADMIN ( QUAN LI DANG KY KHOA HOC )
--- lay danh sach dang ky
+-- Lấy danh sách đăng ký khóa học có phân trang
 DELIMITER //
 
 CREATE PROCEDURE get_students_by_course_paginated(
@@ -641,21 +636,186 @@ BEGIN
         s.name AS student_name,
         s.email AS student_email,
         e.registered_at,
-        e.status
+        e.status,
+        c.name AS course_name
     FROM enrollment e
              JOIN student s ON e.student_id = s.id
+             JOIN course c ON e.course_id = c.id
     WHERE e.course_id = p_course_id
     ORDER BY e.registered_at DESC
     LIMIT p_page_size OFFSET offset_val;
 END //
 
 DELIMITER ;
+-- Lấy tổng số bản ghi
+DELIMITER $$
 
+CREATE PROCEDURE get_enrollment_count_by_course(IN course_id_param INT, OUT total_count INT)
+BEGIN
+    SELECT COUNT(*) INTO total_count
+    FROM enrollment
+    WHERE course_id = course_id_param;
+END $$
 
+DELIMITER ;
 
+-- Duyệt và từ chối đăng ký
+DELIMITER $$
 
+CREATE PROCEDURE UpdateEnrollmentStatus(
+    IN p_enrollmentId INT,
+    IN p_status VARCHAR(50)
+)
+BEGIN
+    UPDATE enrollment
+    SET status = p_status
+    WHERE id = p_enrollmentId AND status = 'waiting';
+END $$
 
+DELIMITER ;
+-- Lấy danh sách đăng ký theo trạng thái
+DELIMITER $$
 
+CREATE PROCEDURE GetEnrollmentsByStatus(IN p_status VARCHAR(50))
+BEGIN
+    SELECT
+        e.id,
+        e.student_id,
+        s.name AS student_name,
+        c.name AS course_name,
+        e.registered_at,
+        e.status
+    FROM
+        enrollment e
+            JOIN student s ON e.student_id = s.id
+            JOIN course c ON e.course_id = c.id
+    WHERE e.status = p_status;
+END $$
 
+DELIMITER ;
+--
+DELIMITER $$
 
+CREATE PROCEDURE GetEnrollmentsByStudentIdPaged (
+    IN p_student_id INT,
+    IN p_page INT,
+    IN p_page_size INT
+)
+BEGIN
+    DECLARE offset_value INT;
+    SET offset_value = (p_page - 1) * p_page_size;
 
+    SELECT
+        c.id AS course_id,
+        c.name AS course_name,
+        e.registered_at,
+        e.status
+    FROM
+        enrollment e
+            JOIN
+        course c ON e.course_id = c.id
+    WHERE
+        e.student_id = p_student_id
+    ORDER BY
+        e.registered_at DESC
+    LIMIT
+        p_page_size OFFSET offset_value;
+END $$
+
+DELIMITER ;
+--
+DELIMITER $$
+
+CREATE PROCEDURE GetEnrollmentCountByStudentId (
+    IN p_student_id INT,
+    OUT total INT
+)
+BEGIN
+    SELECT COUNT(*) INTO total
+    FROM enrollment
+    WHERE student_id = p_student_id;
+END $$
+
+DELIMITER ;
+-- Thống kê tổng số lượng khóa học và học viên
+
+DELIMITER $$
+
+CREATE PROCEDURE GetTotalCoursesAndStudents()
+BEGIN
+    DECLARE total_courses INT;
+    DECLARE total_students INT;
+
+    -- Đếm tổng số khóa học
+    SELECT COUNT(*) INTO total_courses
+    FROM course;
+
+    SELECT COUNT(DISTINCT s.id) INTO total_students
+    FROM student s
+             JOIN enrollment e ON s.id = e.student_id
+    WHERE e.status = 'confirm';
+
+    SELECT total_courses AS total_courses, total_students AS total_students;
+END$$
+
+DELIMITER ;
+
+call GetTotalCoursesAndStudents();
+
+--
+DELIMITER $$
+CREATE PROCEDURE GetTotalCourseCount(OUT total INT)
+BEGIN
+    SELECT COUNT(*) INTO total FROM course;
+END$$
+DELIMITER ;
+--
+DELIMITER $$
+CREATE PROCEDURE GetTotalConfirmedStudents(OUT total INT)
+BEGIN
+    SELECT COUNT(DISTINCT student_id)
+    INTO total
+    FROM enrollment
+    WHERE status = 'confirm';
+END$$
+DELIMITER ;
+--
+DELIMITER $$
+CREATE PROCEDURE GetStudentCountPerCourse()
+BEGIN
+    SELECT c.name AS course_name, COUNT(e.student_id) AS student_count
+    FROM course c
+             JOIN enrollment e ON c.id = e.course_id
+    WHERE e.status = 'confirm'
+    GROUP BY c.name;
+END$$
+DELIMITER ;
+-- Lấy top 5 khóa học có số lượng sinh viên đăng ký nhiều nhất
+DELIMITER $$
+
+CREATE PROCEDURE GetTop5CoursesByStudentCount()
+BEGIN
+    SELECT c.name , COUNT(e.student_id) AS student_count
+    FROM course c
+             JOIN enrollment e ON c.id = e.course_id
+    WHERE e.status = 'confirm'
+    GROUP BY c.name
+    ORDER BY student_count DESC
+    LIMIT 5;
+END$$
+
+DELIMITER ;
+-- Liệt kê các khóa học có trên 10 học viên
+DELIMITER $$
+
+CREATE PROCEDURE GetCoursesWithMoreThan10Students()
+BEGIN
+    SELECT c.name, COUNT(e.student_id) AS student_count
+    FROM course c
+             JOIN enrollment e ON c.id = e.course_id
+    WHERE e.status = 'confirm'
+    GROUP BY c.name
+    HAVING student_count > 10;
+END$$
+
+DELIMITER ;
