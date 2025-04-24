@@ -1,6 +1,7 @@
 package ra.edu.business.service.student;
 
 import ra.edu.business.dao.student.StudentDAOImp;
+import ra.edu.business.model.course.Course;
 import ra.edu.business.model.enrollment.Enrollment;
 import ra.edu.business.model.student.Student;
 import ra.edu.utils.PageInfo;

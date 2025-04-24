@@ -108,4 +108,13 @@ public class CourseServiceImp implements CourseService{
         return courseDAOImp.registerCourseForStudent(studentId, courseId);
     }
 
+    @Override
+    public String getCourseNameById(int courseId) {
+        Course course =(Course) courseDAOImp.findById(courseId);
+        if (course != null) {
+            return course.getName();  // Giả sử khóa học có thuộc tính "name"
+        }
+        return "Unknown Course";
+    }
+
 }

@@ -10,4 +10,5 @@ public interface CourseService extends AppService {
     PageInfo<Course> getSortedPagedData(String sortColumn, String sortOrder, int page, int size);
     boolean isCourseRegisteredByStudent(int studentId, int courseId);
     boolean registerCourseForStudent(int studentId, int courseId);
+    String getCourseNameById(int courseId);
 }

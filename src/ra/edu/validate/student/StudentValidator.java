@@ -70,7 +70,7 @@ public class StudentValidator {
         }
     }
 
-    public static String validateEmail(String message, Scanner sc, List<Student> studentList) {
+    public static String validateEmailA(String message, Scanner sc, List<Student> studentList) {
         while (true) {
             System.out.print(message);
             String email = sc.nextLine().trim();
@@ -81,7 +81,7 @@ public class StudentValidator {
                 System.out.println("Email không được vượt quá 100 ký tự.");
             } else if (!isValidEmailFormat(email)) {
                 System.out.println("Email không hợp lệ. Vui lòng nhập lại.");
-            } else if (isEmailExists(email, studentList)) {
+            } else if (isEmailExistsA(email, studentList)) {
                 System.out.println(Color.RED + "Email này đã tồn tại trong hệ thống. Vui lòng chọn email khác." + Color.RESET);
             } else {
                 return email;
@@ -89,9 +89,37 @@ public class StudentValidator {
         }
     }
 
-    private static boolean isEmailExists(String email, List<Student> studentList) {
-        for (Student student : studentList) {
-            if (student.getEmail().equalsIgnoreCase(email)) {
+    public static String validateEmail(String message, Scanner sc, List<Student> studentList, Student currentStudent) {
+        while (true) {
+            System.out.print(message);
+            String email = sc.nextLine().trim();
+
+            if (email.isEmpty()) {
+                System.out.println("Email không được để trống.");
+            } else if (email.length() > 100) {
+                System.out.println("Email không được vượt quá 100 ký tự.");
+            } else if (!isValidEmailFormat(email)) {
+                System.out.println("Email không hợp lệ. Vui lòng nhập lại.");
+            } else if (isEmailExists(email, studentList, currentStudent)) {
+                System.out.println(Color.RED + "Email này đã tồn tại trong hệ thống. Vui lòng chọn email khác." + Color.RESET);
+            } else {
+                return email;
+            }
+        }
+    }
+
+    public static boolean isEmailExists(String email, List<Student> studentList, Student currentStudent) {
+        for (Student s : studentList) {
+            if (s.getEmail().equalsIgnoreCase(email) && s.getId() != currentStudent.getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isEmailExistsA(String email, List<Student> studentList) {
+        for (Student s : studentList) {
+            if (s.getEmail().equalsIgnoreCase(email)) {
                 return true;
             }
         }
@@ -218,8 +246,8 @@ public class StudentValidator {
         }
     }
     public static boolean isStrongPassword(String password) {
-        // Mật khẩu phải có ít nhất 6 ký tự
-        if (password.length() < 6) {
+        // Mật khẩu phải có ít nhất 8 ký tự
+        if (password.length() < 8) {
             return false;
         }
 

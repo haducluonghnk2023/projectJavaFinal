@@ -33,6 +33,7 @@ public class AdminUI {
             System.out.printf("║ %-10s ║ %-52s ║\n", "3", "Quản lý đăng ký khóa học");
             System.out.printf("║ %-10s ║ %-52s ║\n", "4", "Thống kê");
             System.out.printf("║ %-10s ║ %-52s ║\n", "5", "Đăng xuất");
+            System.out.printf("║ %-10s ║ %-52s ║\n", "6", "Thoát chương trình.");
 
             System.out.println("╚════════════╩══════════════════════════════════════════════════════╝" + Color.RESET);
 
@@ -54,6 +55,10 @@ public class AdminUI {
                 case 5:
                     continueProgram = false;
                     AuthUI.logout();
+                    break;
+                case 6 :
+                    System.out.println(Color.YELLOW + "Cảm ơn bạn đã sử dụng chương trình!" + Color.RESET);
+                    System.exit(0);
                     break;
                 default:
                     System.out.println(Color.RED + "Lựa chọn không hợp lệ. Vui lòng chọn từ 1 - 5." + Color.RESET);
@@ -129,7 +134,6 @@ public class AdminUI {
                         "ID", "Tên khóa học", "Số buổi", "Giảng viên", "Ngày tạo");
                 System.out.println(Color.BLUE + "╠═════╬════════════════════════════════════════════╬══════════╬═══════════════════════════════╬════════════╣" + Color.RESET);
 
-                // Hiển thị danh sách khóa học đã sắp xếp
                 if (courses.isEmpty()) {
                     System.out.printf(Color.RED + "║ %-94s ║\n" + Color.RESET, "Không có khóa học nào.");
                 } else {
@@ -212,16 +216,9 @@ public class AdminUI {
     }
 
     public static void addCourse(CourseServiceImp courseServiceImp) {
-        // Lấy danh sách khóa học hiện tại từ service
         List<Course> courseList = courseServiceImp.getAll();
-
-        // Tạo một đối tượng khóa học mới
         Course newCourse = new Course();
-
-        // Nhập dữ liệu cho khóa học, truyền vào courseList để kiểm tra tên trùng
         newCourse.inputData(MainApplication.sc, courseList);
-
-        // Lưu khóa học và kiểm tra kết quả
         boolean isAdded = courseServiceImp.save(newCourse);
         if (isAdded) {
             System.out.println(Color.GREEN + "Thêm khóa học thành công." + Color.RESET);
@@ -231,23 +228,27 @@ public class AdminUI {
     }
 
     public static void updateCourse(CourseServiceImp courseServiceImp) {
-        int updateId = Validator.validateInteger(Color.WHITE + "Nhập ID khóa học muốn chỉnh sửa: " + Color.RESET, MainApplication.sc);
+        Course existingCourse = null;
+        int updateId;
 
-        Course existingCourse = (Course) courseServiceImp.getById(updateId);
+        while (true) {
+            updateId = Validator.validateInteger(Color.WHITE + "Nhập ID khóa học muốn chỉnh sửa: " + Color.RESET, MainApplication.sc);
+            existingCourse = (Course) courseServiceImp.getById(updateId);
 
-        if (existingCourse == null) {
-            System.out.println(Color.RED + "Không tìm thấy khóa học với ID này." + Color.RESET);
-            return;
+            if (existingCourse != null) break;
+            System.out.println(Color.RED + "Không tìm thấy khóa học với ID này. Vui lòng thử lại." + Color.RESET);
         }
 
-        System.out.println(Color.MAGENTA + "\n--- Thông tin hiện tại ---" + Color.RESET);
-        System.out.println(Color.WHITE + "Tên khóa học: " + existingCourse.getName() + Color.RESET);
-        System.out.println(Color.WHITE + "Thời lượng: " + existingCourse.getDuration() + " buổi" + Color.RESET);
-        System.out.println(Color.WHITE + "Giảng viên: " + existingCourse.getInstructor() + Color.RESET);
+        System.out.println(Color.BLUE + "╔══════════════════════════════════════════════════════════════════════════════════════════════════════╗" + Color.RESET);
+        System.out.printf(Color.YELLOW + "║ %-100s ║\n" + Color.RESET, "THÔNG TIN KHÓA HỌC HIỆN TẠI");
+        System.out.println(Color.BLUE + "╠════════════════════╦═════════════════════════════════════════════════════════════════════════════════╣" + Color.RESET);
+        System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "Tên khóa học", existingCourse.getName());
+        System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "Thời lượng", existingCourse.getDuration() + " buổi");
+        System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "Giảng viên", existingCourse.getInstructor());
+        System.out.println(Color.BLUE + "╚════════════════════╩═════════════════════════════════════════════════════════════════════════════════╝" + Color.RESET);
 
-        // Lấy danh sách khóa học hiện tại từ service
+
         List<Course> courseList = courseServiceImp.getAll();
-
         Course updatedCourse = new Course();
         updatedCourse.setId(updateId);
         updatedCourse.setCreateAt(existingCourse.getCreateAt());
@@ -256,12 +257,15 @@ public class AdminUI {
         boolean exit = false;
 
         while (!exit) {
-            System.out.println(Color.MAGENTA + "\nChọn thông tin cần cập nhật:" + Color.RESET);
-            System.out.println(Color.YELLOW + "1. Tên khóa học" + Color.RESET);
-            System.out.println(Color.YELLOW + "2. Thời lượng khóa học" + Color.RESET);
-            System.out.println(Color.YELLOW + "3. Giảng viên" + Color.RESET);
-            System.out.println(Color.YELLOW + "4. Cập nhật tất cả" + Color.RESET);
-            System.out.println(Color.YELLOW + "0. Lưu và thoát" + Color.RESET);
+            System.out.println(Color.BLUE + "\n╔════════════════════════════════════════════════════════════╗" + Color.RESET);
+            System.out.printf(Color.YELLOW + "║ %-58s ║\n" + Color.RESET, "CHỌN THÔNG TIN CẦN CẬP NHẬT");
+            System.out.println(Color.BLUE + "╠════╦═══════════════════════════════════════════════════════╣" + Color.RESET);
+            System.out.printf(Color.CYAN + "║ %-2s ║ %-53s ║\n" + Color.RESET, "1", "Tên khóa học");
+            System.out.printf(Color.CYAN + "║ %-2s ║ %-53s ║\n" + Color.RESET, "2", "Thời lượng khóa học");
+            System.out.printf(Color.CYAN + "║ %-2s ║ %-53s ║\n" + Color.RESET, "3", "Giảng viên");
+            System.out.printf(Color.CYAN + "║ %-2s ║ %-53s ║\n" + Color.RESET, "4", "Cập nhật tất cả");
+            System.out.printf(Color.CYAN + "║ %-2s ║ %-53s ║\n" + Color.RESET, "0", "Lưu và thoát");
+            System.out.println(Color.BLUE + "╚════╩═══════════════════════════════════════════════════════╝" + Color.RESET);
 
             int choice = Validator.validateInteger(Color.WHITE + "Lựa chọn của bạn: " + Color.RESET, MainApplication.sc);
 
@@ -292,7 +296,7 @@ public class AdminUI {
             }
         }
 
-        // Nếu người dùng không cập nhật trường nào thì giữ nguyên giá trị cũ
+        // Nếu không cập nhật thì giữ nguyên
         if (updatedCourse.getName() == null) {
             updatedCourse.setName(existingCourse.getName());
         }
@@ -304,6 +308,15 @@ public class AdminUI {
         }
 
         if (updated) {
+            System.out.println(Color.BLUE + "\n╔══════════════════════════════════════════════════════════════════════════════════════════════════════╗" + Color.RESET);
+            System.out.printf(Color.YELLOW + "║ %-100s ║\n" + Color.RESET, "THÔNG TIN SAU KHI CHỈNH SỬA");
+            System.out.println(Color.BLUE + "╠════════════════════╦═════════════════════════════════════════════════════════════════════════════════╣" + Color.RESET);
+            System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "Tên khóa học", updatedCourse.getName());
+            System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "Thời lượng", updatedCourse.getDuration() + " buổi");
+            System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "Giảng viên", updatedCourse.getInstructor());
+            System.out.println(Color.BLUE + "╚════════════════════╩═════════════════════════════════════════════════════════════════════════════════╝" + Color.RESET);
+
+
             boolean isUpdated = courseServiceImp.update(updatedCourse);
             if (isUpdated) {
                 System.out.println(Color.GREEN + "Cập nhật thành công." + Color.RESET);
@@ -316,10 +329,18 @@ public class AdminUI {
     }
 
     public static void deleteCourse(Scanner sc, CourseServiceImp courseServiceImp) {
-        int deleteId = Validator.validateInteger(Color.WHITE + "Nhập ID khóa học muốn xóa: " + Color.RESET,sc);
-        boolean isDeleted = courseServiceImp.delete(deleteId);
-        if (isDeleted) {
-            System.out.println(Color.GREEN + "Xóa khóa học thành công." + Color.RESET);
+        int deleteId = Validator.validateInteger(Color.WHITE + "Nhập ID khóa học muốn xóa: " + Color.RESET, sc);
+
+        System.out.print(Color.YELLOW + "Bạn có chắc chắn muốn xóa khóa học với ID " + deleteId + "? (y/n): " + Color.RESET);
+        String confirm = sc.nextLine().trim().toLowerCase();
+
+        if (confirm.equals("y") || confirm.equals("yes")) {
+            boolean isDeleted = courseServiceImp.delete(deleteId);
+            if (isDeleted) {
+                System.out.println(Color.GREEN + "Xóa khóa học thành công." + Color.RESET);
+            }
+        } else {
+            System.out.println(Color.CYAN + "Đã hủy thao tác xóa khóa học." + Color.RESET);
         }
     }
 
@@ -690,11 +711,6 @@ public class AdminUI {
         List<Student> studentList = studentServiceImp.getAll();
 
         Student newStudent = new Student();
-        System.out.println("Danh sách sinh viên hiện có:");
-        for (Student s : studentList) {
-            System.out.println("- " + s.getEmail());
-        }
-
         newStudent.inputData(MainApplication.sc, studentList);
 
         boolean isAdded = studentServiceImp.save(newStudent);
@@ -715,14 +731,17 @@ public class AdminUI {
             return;
         }
 
-        System.out.println(Color.MAGENTA + "\n--- Thông tin hiện tại ---" + Color.RESET);
-        System.out.println(Color.WHITE + "ID          : " + existingStudent.getId() + Color.RESET);
-        System.out.println(Color.WHITE + "Họ tên       : " + existingStudent.getName() + Color.RESET);
-        System.out.println(Color.WHITE + "Ngày sinh    : " + existingStudent.getBirthday() + Color.RESET);
-        System.out.println(Color.WHITE + "Email        : " + existingStudent.getEmail() + Color.RESET);
-        System.out.println(Color.WHITE + "Trạng thái   : " + (existingStudent.isStatus() ? "Đang hoạt động" : "Không hoạt động") + Color.RESET);
-        System.out.println(Color.WHITE + "SĐT          : " + existingStudent.getPhone() + Color.RESET);
-        System.out.println(Color.WHITE + "Ngày tạo     : " + existingStudent.getCreated_at() + Color.RESET);
+        System.out.println(Color.BLUE + "╔══════════════════════════════════════════════════════════════════════════════════════════════════════╗" + Color.RESET);
+        System.out.printf(Color.YELLOW + "║ %-100s ║\n" + Color.RESET, "THÔNG TIN HỌC VIÊN HIỆN TẠI");
+        System.out.println(Color.BLUE + "╠════════════════════╦═════════════════════════════════════════════════════════════════════════════════╣" + Color.RESET);
+        System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "ID",  existingStudent.getId());
+        System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "Họ tên", existingStudent.getName());
+        System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "Ngày sinh", existingStudent.getBirthday());
+        System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "Email", existingStudent.getEmail());
+        System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "Trạng thái", existingStudent.isStatus() ? "Đang hoạt động" : "Không hoạt động");
+        System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "SĐT", existingStudent.getPhone());
+        System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "Ngày tạo ", existingStudent.getCreated_at());
+        System.out.println(Color.BLUE + "╚════════════════════╩═════════════════════════════════════════════════════════════════════════════════╝" + Color.RESET);
 
         List<Student> studentList = studentServiceImp.getAll();
 
@@ -739,14 +758,17 @@ public class AdminUI {
         boolean exit = false;
 
         while (!exit) {
-            System.out.println(Color.MAGENTA + "\nChọn thông tin cần cập nhật:" + Color.RESET);
-            System.out.println(Color.YELLOW + "1. Họ tên" + Color.RESET);
-            System.out.println(Color.YELLOW + "2. Ngày sinh" + Color.RESET);
-            System.out.println(Color.YELLOW + "3. Email" + Color.RESET);
-            System.out.println(Color.YELLOW + "4. Trạng thái" + Color.RESET);
-            System.out.println(Color.YELLOW + "5. Số điện thoại" + Color.RESET);
-            System.out.println(Color.YELLOW + "6. Cập nhật tất cả" + Color.RESET);
-            System.out.println(Color.YELLOW + "0. Lưu và thoát" + Color.RESET);
+            System.out.println(Color.BLUE + "\n╔════════════════════════════════════════════════════════════╗" + Color.RESET);
+            System.out.printf(Color.YELLOW + "║ %-58s ║\n" + Color.RESET, "CHỌN THÔNG TIN CẦN CẬP NHẬT");
+            System.out.println(Color.BLUE + "╠════╦═══════════════════════════════════════════════════════╣" + Color.RESET);
+            System.out.printf(Color.CYAN + "║ %-2s ║ %-53s ║\n" + Color.RESET, "1", "Họ tên");
+            System.out.printf(Color.CYAN + "║ %-2s ║ %-53s ║\n" + Color.RESET, "2", "Ngày sinh");
+            System.out.printf(Color.CYAN + "║ %-2s ║ %-53s ║\n" + Color.RESET, "3", "Email");
+            System.out.printf(Color.CYAN + "║ %-2s ║ %-53s ║\n" + Color.RESET, "4", "Trạng thái");
+            System.out.printf(Color.CYAN + "║ %-2s ║ %-53s ║\n" + Color.RESET, "5", "Số điện thoại");
+            System.out.printf(Color.CYAN + "║ %-2s ║ %-53s ║\n" + Color.RESET, "6", "Cập nhật tất cả");
+            System.out.printf(Color.CYAN + "║ %-2s ║ %-53s ║\n" + Color.RESET, "0", "Lưu và thoát");
+            System.out.println(Color.BLUE + "╚════╩═══════════════════════════════════════════════════════╝" + Color.RESET);
 
             int choice = Validator.validateInteger(Color.WHITE + "Lựa chọn của bạn: " + Color.RESET, MainApplication.sc);
 
@@ -760,7 +782,7 @@ public class AdminUI {
                     updated = true;
                     break;
                 case 3:
-                    updatedStudent.setEmail(StudentValidator.validateEmail("Nhập email mới: ", MainApplication.sc, studentList));
+                    updatedStudent.setEmail(StudentValidator.validateEmail("Nhập email mới: ", MainApplication.sc, studentList, existingStudent));
                     updated = true;
                     break;
                 case 4:
@@ -774,7 +796,7 @@ public class AdminUI {
                 case 6:
                     updatedStudent.setName(StudentValidator.validateName("Nhập họ tên mới: ", MainApplication.sc));
                     updatedStudent.setBirthday(StudentValidator.validateDob("Nhập ngày sinh mới", MainApplication.sc));
-                    updatedStudent.setEmail(StudentValidator.validateEmail("Nhập email mới: ", MainApplication.sc, studentList));
+                    updatedStudent.setEmail(StudentValidator.validateEmail("Nhập email mới: ", MainApplication.sc, studentList,existingStudent));
                     updatedStudent.setStatus(StudentValidator.validateSex("Nhập giới tính mới", MainApplication.sc));
                     updatedStudent.setPhone(StudentValidator.validatePhone("Nhập số điện thoại mới", MainApplication.sc,studentList));
                     updated = true;
@@ -790,6 +812,18 @@ public class AdminUI {
         if (updated) {
             boolean isUpdated = studentServiceImp.update(updatedStudent);
             if (isUpdated) {
+                System.out.println(Color.BLUE + "\n╔══════════════════════════════════════════════════════════════════════════════════════════════════════╗" + Color.RESET);
+                System.out.printf(Color.YELLOW + "║ %-100s ║\n" + Color.RESET, "THÔNG TIN SAU KHI CHỈNH SỬA");
+                System.out.println(Color.BLUE + "╠════════════════════╦═════════════════════════════════════════════════════════════════════════════════╣" + Color.RESET);
+                System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "ID", updatedStudent.getId());
+                System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "Họ tên", updatedStudent.getName());
+                System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "Ngày sinh", updatedStudent.getBirthday());
+                System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "Email", updatedStudent.getEmail());
+                System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "Trạng thái", updatedStudent.isStatus() ? "Đang hoạt động" : "Không hoạt động");
+                System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "SĐT", updatedStudent.getPhone());
+                System.out.printf(Color.CYAN + "║ %-18s ║ %-79s ║\n" + Color.RESET, "Ngày tạo", updatedStudent.getCreated_at());
+                System.out.println(Color.BLUE + "╚════════════════════╩═════════════════════════════════════════════════════════════════════════════════╝" + Color.RESET);
+
                 System.out.println(Color.GREEN + "Cập nhật học viên thành công." + Color.RESET);
             } else {
                 System.out.println(Color.RED + "Cập nhật thất bại." + Color.RESET);
@@ -801,7 +835,18 @@ public class AdminUI {
 
     public static void deleteStudent(Scanner sc, StudentServiceImp studentServiceImp) {
         int deleteId = Validator.validateInteger(Color.WHITE + "Nhập ID sinh viên muốn xóa: " + Color.RESET, sc);
-        studentServiceImp.delete(deleteId);
+
+        System.out.print(Color.YELLOW + "Bạn có chắc chắn muốn xóa sinh viên với ID " + deleteId + "? (y/n): " + Color.RESET);
+        String confirm = sc.nextLine().trim().toLowerCase();
+
+        if (confirm.equals("y") || confirm.equals("yes")) {
+            boolean isDeleted = studentServiceImp.delete(deleteId);
+            if (isDeleted) {
+                System.out.println(Color.GREEN + "Xóa sinh viên thành công." + Color.RESET);
+            }
+        } else {
+            System.out.println(Color.CYAN + "Đã hủy thao tác xóa sinh viên." + Color.RESET);
+        }
     }
 
     public static void searchStudentByKeyword(Scanner sc, StudentServiceImp studentServiceImp) {
@@ -1070,7 +1115,7 @@ public class AdminUI {
             int end = Math.min(start + pageSizeCourse, totalCourses);
 
             System.out.println(Color.CYAN + "\n╔═════ DANH SÁCH KHÓA HỌC ═════════════════════════════════════╗" + Color.RESET);
-            System.out.printf(Color.YELLOW + "║ Trang %d/%d (Hiển thị %d - %d trong tổng %d khóa học)           ║\n" + Color.RESET,
+            System.out.printf(Color.YELLOW + "║ Trang %d/%d (Hiển thị %d - %d trong tổng %d khóa học)            ║\n" + Color.RESET,
                     currentPageCourse, totalPagesCourse, start + 1, end, totalCourses);
             System.out.println(Color.CYAN + "╠═════╦════════════════════════════════════════════════════════╣" + Color.RESET);
             System.out.printf(Color.CYAN + "║ %-3s ║ %-54s ║\n" + Color.RESET, "ID", "Tên khóa học");
@@ -1226,7 +1271,7 @@ public class AdminUI {
     }
 
     public static void approveStudentEnrollment(Scanner sc, EnrollmentServiceImp enrollmentServiceImp) {
-        System.out.println(Color.MAGENTA + "\n=== DUYỆT SINH VIÊN ĐĂNG KÝ KHÓA HỌC ===" + Color.RESET);
+        System.out.println(Color.MAGENTA + "\n============================= DUYỆT SINH VIÊN ĐĂNG KÝ KHÓA HỌC =============================" + Color.RESET);
 
         List<Enrollment> waitingList = enrollmentServiceImp.getEnrollmentsByStatus("waiting");
 
@@ -1235,12 +1280,13 @@ public class AdminUI {
             return;
         }
 
-        System.out.println(Color.CYAN + "+------------+-------------------------+------------------------+---------------------+-----------------+");
-        System.out.printf("| %-10s | %-23s | %-22s | %-19s | %-15s |\n", "Enroll ID", "Tên sinh viên", "Tên khóa học", "Ngày đăng ký", "Trạng thái");
-        System.out.println("+------------+-------------------------+------------------------+---------------------+-----------------+");
+        System.out.println(Color.BLUE + "╔════════════╦════════════════════════════════╦════════════════════════════╦════════════════════╦═══════════════╗" + Color.RESET);
+        System.out.printf(Color.YELLOW + "║ %-10s ║ %-30s ║ %-26s ║ %-18s ║ %-13s ║\n" + Color.RESET,
+                "Enroll ID", "Tên sinh viên", "Tên khóa học", "Ngày đăng ký", "Trạng thái");
+        System.out.println(Color.BLUE + "╠════════════╬════════════════════════════════╬════════════════════════════╬════════════════════╬═══════════════╣" + Color.RESET);
 
         for (Enrollment e : waitingList) {
-            System.out.printf("| %-10d | %-23s | %-22s | %-19s | %-15s |\n",
+            System.out.printf(Color.CYAN + "║ %-10d ║ %-30s ║ %-26s ║ %-18s ║ %-13s ║\n" + Color.RESET,
                     e.getId(),
                     e.getStudentName(),
                     e.getCourseName(),
@@ -1248,34 +1294,48 @@ public class AdminUI {
                     e.getStatus());
         }
 
-        System.out.println("+------------+-------------------------+------------------------+---------------------+-----------------+");
-
-        int enrollmentId = Validator.validateInteger("Nhập ID đăng ký (Enrollment ID) cần duyệt: ", sc);
+        System.out.println(Color.BLUE + "╚════════════╩════════════════════════════════╩════════════════════════════╩════════════════════╩═══════════════╝" + Color.RESET);
 
         Enrollment enrollmentToApprove = null;
-        for (Enrollment e : waitingList) {
-            if (e.getId() == enrollmentId) {
-                enrollmentToApprove = e;
+        int enrollmentId;
+
+        while (true) {
+            enrollmentId = Validator.validateInteger("Nhập ID đăng ký (Enrollment ID) cần duyệt: ", sc);
+
+            for (Enrollment e : waitingList) {
+                if (e.getId() == enrollmentId) {
+                    enrollmentToApprove = e;
+                    break;
+                }
+            }
+
+            if (enrollmentToApprove != null) {
                 break;
             }
+
+            System.out.println(Color.RED + "ID đăng ký không hợp lệ hoặc không tồn tại trong danh sách chờ duyệt. Vui lòng nhập lại!" + Color.RESET);
         }
 
-        if (enrollmentToApprove == null) {
-            System.out.println(Color.RED + "ID đăng ký không hợp lệ hoặc không tồn tại." + Color.RESET);
-            return;
-        }
 
-        boolean success = enrollmentServiceImp.approveEnrollment(enrollmentId);
+        System.out.printf(Color.YELLOW + "Bạn có chắc chắn muốn duyệt đơn đăng ký của sinh viên '%s' cho khóa học '%s'? (y/n): " + Color.RESET,
+                enrollmentToApprove.getStudentName(), enrollmentToApprove.getCourseName());
+        String confirm = sc.nextLine().trim().toLowerCase();
 
-        if (success) {
-            System.out.println(Color.GREEN + "Duyệt thành công! Trạng thái đã chuyển sang 'confirm'." + Color.RESET);
+        if (confirm.equals("y") || confirm.equals("yes")) {
+            boolean success = enrollmentServiceImp.approveEnrollment(enrollmentId);
+
+            if (success) {
+                System.out.println(Color.GREEN + "Duyệt thành công! Trạng thái đã chuyển sang 'confirm'." + Color.RESET);
+            } else {
+                System.out.println(Color.RED + "Duyệt thất bại! Chỉ có thể duyệt các đơn có trạng thái 'waiting'." + Color.RESET);
+            }
         } else {
-            System.out.println(Color.RED + "Duyệt thất bại! Chỉ có thể duyệt các đơn có trạng thái 'waiting'." + Color.RESET);
+            System.out.println(Color.CYAN + "Đã hủy thao tác duyệt đơn đăng ký." + Color.RESET);
         }
     }
 
     public static void rejectStudentEnrollment(Scanner sc, EnrollmentServiceImp enrollmentServiceImp) {
-        System.out.println(Color.MAGENTA + "\n=== TỪ CHỐI SINH VIÊN ĐĂNG KÝ KHÓA HỌC ===" + Color.RESET);
+        System.out.println(Color.MAGENTA + "\n============================= TỪ CHỐI SINH VIÊN ĐĂNG KÝ KHÓA HỌC =============================" + Color.RESET);
 
         List<Enrollment> waitingList = enrollmentServiceImp.getEnrollmentsByStatus("waiting");
 
@@ -1284,12 +1344,13 @@ public class AdminUI {
             return;
         }
 
-        System.out.println(Color.CYAN + "+------------+-------------------------+------------------------+---------------------+-----------------+");
-        System.out.printf("| %-10s | %-23s | %-22s | %-19s | %-15s |\n", "Enroll ID", "Tên sinh viên", "Tên khóa học", "Ngày đăng ký", "Trạng thái");
-        System.out.println("+------------+-------------------------+------------------------+---------------------+-----------------+");
+        System.out.println(Color.BLUE + "╔════════════╦════════════════════════════════╦════════════════════════════╦════════════════════╦═══════════════╗" + Color.RESET);
+        System.out.printf(Color.YELLOW + "║ %-10s ║ %-30s ║ %-26s ║ %-18s ║ %-13s ║\n" + Color.RESET,
+                "Enroll ID", "Tên sinh viên", "Tên khóa học", "Ngày đăng ký", "Trạng thái");
+        System.out.println(Color.BLUE + "╠════════════╬════════════════════════════════╬════════════════════════════╬════════════════════╬═══════════════╣" + Color.RESET);
 
         for (Enrollment e : waitingList) {
-            System.out.printf("| %-10d | %-23s | %-22s | %-19s | %-15s |\n",
+            System.out.printf(Color.CYAN + "║ %-10d ║ %-30s ║ %-26s ║ %-18s ║ %-13s ║\n" + Color.RESET,
                     e.getId(),
                     e.getStudentName(),
                     e.getCourseName(),
@@ -1297,29 +1358,43 @@ public class AdminUI {
                     e.getStatus());
         }
 
-        System.out.println("+------------+-------------------------+------------------------+---------------------+-----------------+");
-
-        int enrollmentId = Validator.validateInteger("Nhập ID đăng ký (Enrollment ID) cần từ chối: ", sc);
+        System.out.println(Color.BLUE + "╚════════════╩════════════════════════════════╩════════════════════════════╩════════════════════╩═══════════════╝" + Color.RESET);
 
         Enrollment enrollmentToReject = null;
-        for (Enrollment e : waitingList) {
-            if (e.getId() == enrollmentId) {
-                enrollmentToReject = e;
+        int enrollmentId;
+
+        while (true) {
+            enrollmentId = Validator.validateInteger("Nhập ID đăng ký (Enrollment ID) cần từ chối: ", sc);
+
+            for (Enrollment e : waitingList) {
+                if (e.getId() == enrollmentId) {
+                    enrollmentToReject = e;
+                    break;
+                }
+            }
+
+            if (enrollmentToReject != null) {
                 break;
             }
+
+            System.out.println(Color.RED + "ID đăng ký không hợp lệ hoặc không tồn tại trong danh sách chờ duyệt. Vui lòng nhập lại!" + Color.RESET);
         }
 
-        if (enrollmentToReject == null) {
-            System.out.println(Color.RED + "ID đăng ký không hợp lệ hoặc không tồn tại." + Color.RESET);
-            return;
-        }
 
-        boolean success = enrollmentServiceImp.denyEnrollment(enrollmentId);
+        System.out.printf(Color.YELLOW + "Bạn có chắc chắn muốn từ chối đơn đăng ký của sinh viên '%s' cho khóa học '%s'? (y/n): " + Color.RESET,
+                enrollmentToReject.getStudentName(), enrollmentToReject.getCourseName());
+        String confirm = sc.nextLine().trim().toLowerCase();
 
-        if (success) {
-            System.out.println(Color.GREEN + "Từ chối thành công! Trạng thái đã chuyển sang 'denied'." + Color.RESET);
+        if (confirm.equals("y") || confirm.equals("yes")) {
+            boolean success = enrollmentServiceImp.denyEnrollment(enrollmentId);
+
+            if (success) {
+                System.out.println(Color.GREEN + "Từ chối thành công! Trạng thái đã chuyển sang 'denied'." + Color.RESET);
+            } else {
+                System.out.println(Color.RED + "Từ chối thất bại! Chỉ có thể từ chối các đơn có trạng thái 'waiting'." + Color.RESET);
+            }
         } else {
-            System.out.println(Color.RED + "Từ chối thất bại! Chỉ có thể từ chối các đơn có trạng thái 'waiting'." + Color.RESET);
+            System.out.println(Color.CYAN + "Đã hủy thao tác từ chối đơn đăng ký." + Color.RESET);
         }
     }
 
@@ -1365,14 +1440,17 @@ public class AdminUI {
     }
 
     public static void statisticStudentAndCourse(StatisticServiceImp courseServiceImp, EnrollmentServiceImp enrollmentServiceImp) {
-        System.out.println(Color.MAGENTA + "\n=== THỐNG KÊ TỔNG SỐ LƯỢNG KHÓA HỌC & HỌC VIÊN ===" + Color.RESET);
+        System.out.println(Color.MAGENTA + "\n======================== THỐNG KÊ TỔNG SỐ KHÓA HỌC & HỌC VIÊN ========================" + Color.RESET);
 
         int totalCourses = courseServiceImp.getTotalCourseCount();
         int totalConfirmedStudents = enrollmentServiceImp.countConfirmedStudents();
 
-        System.out.println(Color.CYAN + "\n===== THỐNG KÊ HỆ THỐNG =====" + Color.RESET);
-        System.out.println("Tổng số khóa học      : " + Color.YELLOW + totalCourses + Color.RESET);
-        System.out.println("Tổng số học viên    : " + Color.YELLOW + totalConfirmedStudents + Color.RESET);
+        System.out.println(Color.BLUE + "╔════════════════════════════════════╦════════════════════════════════════╗" + Color.RESET);
+        System.out.printf(Color.YELLOW + "║ %-34s ║ %-34s ║\n" + Color.RESET,
+                "TỔNG SỐ KHÓA HỌC", "TỔNG SỐ HỌC VIÊN ĐÃ XÁC NHẬN");
+        System.out.println(Color.BLUE + "╠════════════════════════════════════╬════════════════════════════════════╣" + Color.RESET);
+        System.out.printf(Color.CYAN + "║ %-34d ║ %-34d ║\n" + Color.RESET, totalCourses, totalConfirmedStudents);
+        System.out.println(Color.BLUE + "╚════════════════════════════════════╩════════════════════════════════════╝" + Color.RESET);
     }
 
     public static void statisticStudentsPerCourse(Scanner sc) {
@@ -1490,17 +1568,19 @@ public class AdminUI {
             return;
         }
 
-        System.out.println(Color.CYAN + "+-----------------------------+------------------+");
-        System.out.printf("| %-27s | %-16s |\n", "Tên khóa học", "Số học viên");
-        System.out.println("+-----------------------------+------------------+");
+        System.out.println(Color.MAGENTA + "\n========================== TOP 5 KHÓA HỌC CÓ NHIỀU HỌC VIÊN NHẤT ==========================" + Color.RESET);
+
+        System.out.println(Color.BLUE + "╔════════════════════════════════════╦════════════════════════════╗" + Color.RESET);
+        System.out.printf(Color.YELLOW + "║ %-34s ║ %-26s ║\n" + Color.RESET, "Tên khóa học", "Số học viên đã xác nhận");
+        System.out.println(Color.BLUE + "╠════════════════════════════════════╬════════════════════════════╣" + Color.RESET);
 
         for (Object[] stat : topCourses) {
             String courseName = (String) stat[0];
             int studentCount = (int) stat[1];
-            System.out.printf("| %-27s | %-16d |\n", courseName, studentCount);
+            System.out.printf(Color.CYAN + "║ %-34s ║ %-26d ║\n" + Color.RESET, courseName, studentCount);
         }
 
-        System.out.println("+-----------------------------+------------------+");
+        System.out.println(Color.BLUE + "╚════════════════════════════════════╩════════════════════════════╝" + Color.RESET);
     }
 
     public static void statisticCoursesWithMoreThan10Students() {
@@ -1513,16 +1593,18 @@ public class AdminUI {
             return;
         }
 
-        System.out.println(Color.CYAN + "+-----------------------------+------------------+");
-        System.out.printf("| %-25s | %-16s |\n", "Tên khóa học", "Số học viên");
-        System.out.println("+-----------------------------+------------------+");
+        System.out.println(Color.MAGENTA + "\n=========== DANH SÁCH KHÓA HỌC CÓ HƠN 10 HỌC VIÊN ĐÃ XÁC NHẬN ===========" + Color.RESET);
+
+        System.out.println(Color.BLUE + "╔════════════════════════════════════╦════════════════════════════╗" + Color.RESET);
+        System.out.printf(Color.YELLOW + "║ %-34s ║ %-26s ║\n" + Color.RESET, "Tên khóa học", "Số học viên đã xác nhận");
+        System.out.println(Color.BLUE + "╠════════════════════════════════════╬════════════════════════════╣" + Color.RESET);
 
         for (Object[] stat : courses) {
             String courseName = (String) stat[0];
             int studentCount = (int) stat[1];
-            System.out.printf("| %-25s | %-16d |\n", courseName, studentCount);
+            System.out.printf(Color.CYAN + "║ %-34s ║ %-26d ║\n" + Color.RESET, courseName, studentCount);
         }
 
-        System.out.println("+-----------------------------+------------------+");
+        System.out.println(Color.BLUE + "╚════════════════════════════════════╩════════════════════════════╝" + Color.RESET);
     }
 }

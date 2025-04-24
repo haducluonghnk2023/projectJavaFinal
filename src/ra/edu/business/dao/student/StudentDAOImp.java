@@ -66,7 +66,7 @@ public class StudentDAOImp implements StudentDAO{
 
     @Override
     public boolean save(Student student) {
-        String sql = "{CALL AddStudent(?, ?, ?, ?, ?, ?)}"; // Thêm tham số OUT
+        String sql = "{CALL AddStudent(?, ?, ?, ?, ?, ?)}";
 
         try (Connection conn = ConnectionDB.openConnection();
              CallableStatement callSt = conn.prepareCall(sql)) {
@@ -145,7 +145,6 @@ public class StudentDAOImp implements StudentDAO{
             callSt.setInt(1, id);
             callSt.execute();
 
-            System.out.println(Color.GREEN + "Xóa sinh viên thành công." + Color.RESET);
             return true;
 
         } catch (SQLException e) {

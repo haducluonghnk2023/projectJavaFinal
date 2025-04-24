@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class Course implements InputTable<Course> {
     @Override
-    public void inputData(Scanner sc, List<Course> courseList) {
+    public void inputData(Scanner sc, List<Course> courseList ) {
         // Nhập tên khóa học (có kiểm tra trùng tên và chuẩn hóa)
         this.name = CourseValidator.validateCourseName(sc, courseList);
 

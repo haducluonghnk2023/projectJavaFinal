@@ -109,16 +109,31 @@ public class Student implements InputTable<Student> {
                 '}';
     }
 
+    public void inputDataS(Scanner sc, List<Student> studentList, Object obj) {
+        Student currentStudent = (obj instanceof Student) ? (Student) obj : null;
 
-    @Override
-    public void inputData(Scanner sc, List<Student> studentList) {
-        this.name = StudentValidator.validateName("Nhập họ tên :",sc);
-        this.email = StudentValidator.validateEmail("Nhập email sinh viên: ", sc, studentList);
+        this.name = StudentValidator.validateName("Nhập họ tên: ", sc);
+        this.email = StudentValidator.validateEmail("Nhập email sinh viên: ", sc, studentList, currentStudent);
         this.birthday = StudentValidator.validateDob("Nhập ngày sinh sinh viên: ", sc);
-        this.phone = StudentValidator.validatePhone("Nhập số điện thoại sinh viên: ", sc,studentList);
+        this.phone = StudentValidator.validatePhone("Nhập số điện thoại sinh viên: ", sc, studentList);
         this.status = StudentValidator.validateSex("Nhập giới tính sinh viên (true/false): ", sc);
+
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         this.created_at = now.format(formatter);
     }
+
+    @Override
+    public void inputData(Scanner sc, List<Student> studentList) {
+        this.name = StudentValidator.validateName("Nhập họ tên: ", sc);
+        this.email = StudentValidator.validateEmailA("Nhập email sinh viên: ", sc, studentList);
+        this.birthday = StudentValidator.validateDob("Nhập ngày sinh sinh viên: ", sc);
+        this.phone = StudentValidator.validatePhone("Nhập số điện thoại sinh viên: ", sc, studentList);
+        this.status = StudentValidator.validateSex("Nhập giới tính sinh viên (true/false): ", sc);
+
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        this.created_at = now.format(formatter);
+    }
+
 }
