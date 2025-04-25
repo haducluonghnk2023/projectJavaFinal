@@ -175,20 +175,6 @@ public class StudentValidator {
         return false;
     }
 
-    public static String validatePassword(String message, Scanner sc) {
-        while (true) {
-            System.out.print(message);
-            String pass = sc.nextLine().trim();
-            if (pass.isEmpty()) {
-                System.out.println("Mật khẩu không được để trống.");
-            } else if (pass.length() < 6) {
-                System.out.println("Mật khẩu phải có ít nhất 6 ký tự.");
-            } else {
-                return pass;
-            }
-        }
-    }
-
     public static LocalDate validateCreatedAt(String message, Scanner sc) {
         while (true) {
             System.out.print(message + " (yyyy-MM-dd, bỏ trống để lấy ngày hiện tại): ");
@@ -211,12 +197,12 @@ public class StudentValidator {
 
     public static String validateSortColumn(Scanner sc) {
         while (true) {
-            System.out.print(Color.WHITE + "Chọn trường sắp xếp (name / id): " + Color.RESET);
+            System.out.print(Color.WHITE + "Chọn trường sắp xếp (course_name / registered_at): " + Color.RESET);
             String input = sc.nextLine().trim().toLowerCase();
-            if (input.equals("name") || input.equals("id")) {
+            if (input.equals("course_name") || input.equals("registered_at")) {
                 return input;
             }
-            System.out.println(Color.RED + "Trường sắp xếp không hợp lệ. Vui lòng chọn 'name' hoặc 'id'." + Color.RESET);
+            System.out.println(Color.RED + "Trường sắp xếp không hợp lệ. Vui lòng chọn 'course_name' hoặc 'registered_at'." + Color.RESET);
         }
     }
 

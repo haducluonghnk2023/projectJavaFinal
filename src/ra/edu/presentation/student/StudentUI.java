@@ -299,35 +299,77 @@ public class StudentUI {
             return;
         }
 
-        System.out.printf(Color.CYAN + "%-5s | %-30s | %-10s | %-25s\n" + Color.RESET,
-                "ID", "Tên khóa học", "Số buổi", "Giảng viên");
-        System.out.println(Color.YELLOW + "------------------------------------------------------------" + Color.RESET);
+        int pageSize = StudentValidator.validatePageSize(sc);
+        int currentPage = 1;
+        int totalPages = (int) Math.ceil((double) allCourses.size() / pageSize);
+        boolean selecting = true;
 
-        for (Course course : allCourses) {
-            System.out.printf(Color.WHITE + "%-5d | %-30s | %-10d | %-25s\n" + Color.RESET,
-                    course.getId(), course.getName(), course.getDuration(), course.getInstructor());
-        }
+        while (selecting) {
+            int start = (currentPage - 1) * pageSize;
+            int end = Math.min(start + pageSize, allCourses.size());
+            List<Course> pageCourses = allCourses.subList(start, end);
 
-        // Nhập ID khóa học muốn đăng ký
-        int courseId = Validator.validateInteger(Color.WHITE + "Nhập ID khóa học bạn muốn đăng ký: " + Color.RESET, sc);
+            System.out.println(Color.MAGENTA + "\n--- Danh sách khóa học (Trang " + currentPage + "/" + totalPages + ") ---" + Color.RESET);
+            System.out.println(Color.CYAN + "╔═════╦════════════════════════════════════╦════════════╦══════════════════════════╗" + Color.RESET);
+            System.out.println(Color.YELLOW + "║ ID  ║ Tên khóa học                       ║ Số buổi    ║ Giảng viên               ║" + Color.RESET);
+            System.out.println(Color.CYAN + "╠═════╬════════════════════════════════════╬════════════╬══════════════════════════╣" + Color.RESET);
 
-        Course selectedCourse = (Course) courseServiceImp.getById(courseId);
-        if (selectedCourse == null) {
-            System.out.println(Color.RED + "Không tìm thấy khóa học với ID đã nhập." + Color.RESET);
-            return;
-        }
+            for (Course course : pageCourses) {
+                System.out.printf(Color.WHITE + "║ %-3d ║ %-34s ║ %-10d ║ %-24s ║\n" + Color.RESET,
+                        course.getId(), course.getName(), course.getDuration(), course.getInstructor());
+            }
 
-        Account account = MainApplication.currentUser;
-        Student student = studentServiceImp.getById(account.getStudent_id());
-        if (student == null) {
-            System.out.println("Không tìm thấy thông tin học viên tương ứng với tài khoản này.");
-            return;
-        }
-        int studentId = student.getId();
+            System.out.println(Color.CYAN + "╚═════╩════════════════════════════════════╩════════════╩══════════════════════════╝" + Color.RESET);
 
-        boolean success = courseServiceImp.registerCourseForStudent(studentId, courseId);
-        if (success) {
-            System.out.println(Color.GREEN + "Đăng ký khóa học thành công!" + Color.RESET);
+            System.out.println(Color.MAGENTA + "\nNhập ID khóa học để đăng ký, hoặc:" + Color.RESET);
+            if (currentPage > 1) {
+                System.out.print(Color.CYAN + "p - Trang trước   " + Color.RESET);
+            }
+            if (currentPage < totalPages) {
+                System.out.print(Color.CYAN + "n - Trang tiếp theo   " + Color.RESET);
+            }
+            System.out.println(Color.CYAN + "0 - Thoát" + Color.RESET);
+
+            System.out.print(Color.YELLOW + "Lựa chọn của bạn: " + Color.RESET);
+            String input = sc.nextLine().trim().toLowerCase();
+
+            switch (input) {
+                case "n":
+                    if (currentPage < totalPages) currentPage++;
+                    else System.out.println(Color.RED + "Đang ở trang cuối cùng." + Color.RESET);
+                    break;
+                case "p":
+                    if (currentPage > 1) currentPage--;
+                    else System.out.println(Color.RED + "Đang ở trang đầu tiên." + Color.RESET);
+                    break;
+                case "0":
+                    selecting = false;
+                    break;
+                default:
+                    try {
+                        int courseId = Integer.parseInt(input);
+                        Course selectedCourse =(Course) courseServiceImp.getById(courseId);
+                        if (selectedCourse == null) {
+                            System.out.println(Color.RED + "Không tìm thấy khóa học với ID đã nhập." + Color.RESET);
+                        } else {
+                            Account account = MainApplication.currentUser;
+                            Student student = studentServiceImp.getById(account.getStudent_id());
+                            if (student == null) {
+                                System.out.println(Color.RED + "Không tìm thấy thông tin học viên tương ứng với tài khoản này." + Color.RESET);
+                                return;
+                            }
+
+                            boolean success = courseServiceImp.registerCourseForStudent(student.getId(), courseId);
+                            if (success) {
+                                System.out.println(Color.GREEN + "Đăng ký khóa học thành công!" + Color.RESET);
+                                selecting = false;
+                            }
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println(Color.RED + "Lựa chọn không hợp lệ. Vui lòng nhập ID hợp lệ hoặc lệnh điều hướng." + Color.RESET);
+                    }
+                    break;
+            }
         }
     }
 
@@ -389,7 +431,6 @@ public class StudentUI {
 
                 System.out.println(Color.BLUE + "╚═════╩════════════════════════════════════════╩═══════════════╩════════════╝" + Color.RESET);
 
-                // Tuỳ chọn điều hướng
                 if (pageInfo.getTotalPages() > 1) {
                     System.out.println(Color.MAGENTA + "\nChọn trang (gõ số trang / 0: quay lại menu chính)" + Color.RESET);
                     System.out.print(Color.YELLOW + "Trang: " + Color.RESET);
@@ -524,9 +565,9 @@ public class StudentUI {
     }
 
     public static void sortCoursesWithPaging(Scanner sc, EnrollmentServiceImp enrollmentServiceImp, CourseService courseService) {
-        String sortColumn = CourseValidator.validateSortColumn(sc);
-        String sortOrder = CourseValidator.validateSortOrder(sc);
-        int pageSize = CourseValidator.validatePageSize(sc);
+        String sortColumn = StudentValidator.validateSortColumn(sc);
+        String sortOrder = StudentValidator.validateSortOrder(sc);
+        int pageSize = StudentValidator.validatePageSize(sc);
 
         int currentPage = 1;
         boolean continuePaging = true;
@@ -536,7 +577,6 @@ public class StudentUI {
                 PageInfo<Enrollment> pageInfo = enrollmentServiceImp.getSortedPagedData(sortColumn, sortOrder, currentPage, pageSize);
                 List<Enrollment> enrollments = pageInfo.getRecords();
 
-                // Hiển thị thông tin trang
                 System.out.println(Color.MAGENTA + "\n--- Danh sách đăng ký (Trang " + pageInfo.getCurrentPage() + "/" + pageInfo.getTotalPages() + ") --- Tổng " + pageInfo.getTotalRecords() + " bản ghi" + Color.RESET);
 
                 if (enrollments.isEmpty()) {
@@ -693,5 +733,4 @@ public class StudentUI {
             System.out.println(Color.RED + "Đổi mật khẩu thất bại. Vui lòng thử lại." + Color.RESET);
         }
     }
-
 }

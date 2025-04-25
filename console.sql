@@ -110,7 +110,6 @@ DELIMITER $$
 
 CREATE PROCEDURE AddCourse(IN course_name VARCHAR(100), IN course_duration INT, IN course_instructor VARCHAR(100))
 BEGIN
-    -- Thêm khóa học mới vào bảng course
     INSERT INTO course (name, duration, instructor)
     VALUES (course_name, course_duration, course_instructor);
 END$$
@@ -122,7 +121,6 @@ DELIMITER $$
 
 CREATE PROCEDURE UpdateCourse(IN course_id INT, IN course_name VARCHAR(100), IN course_duration INT, IN course_instructor VARCHAR(100))
 BEGIN
-    -- Cập nhật thông tin khóa học theo ID
     UPDATE course
     SET name = course_name,
         duration = course_duration,
@@ -231,6 +229,7 @@ END $$
 DELIMITER ;
 -- STUDENT
 -- Thêm sinh viên mới
+
 DELIMITER //
 
 CREATE PROCEDURE AddNewStudent(
@@ -244,17 +243,14 @@ CREATE PROCEDURE AddNewStudent(
 BEGIN
     DECLARE v_password VARCHAR(255);
     DECLARE v_student_id INT;
-
+    IF EXISTS (SELECT 1 FROM student WHERE email = p_email) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Email đã tồn tại trong hệ thống';
+    END IF;
     INSERT INTO student (name, dob, email, sex, phone, create_at)
     VALUES (p_name, p_dob, p_email, p_sex, p_phone, CURRENT_TIMESTAMP());
-
-
     SET p_rows_affected = ROW_COUNT();
-
     SET v_student_id = LAST_INSERT_ID();
-
     SET v_password = SUBSTRING(UUID(), 1, 8);
-
     INSERT INTO accounts (student_id, email, password, role, status)
     VALUES (v_student_id, p_email, v_password, 'student', 'active');
 
@@ -264,7 +260,6 @@ BEGIN
         'Account created successfully!' AS message;
 
 END //
-
 DELIMITER ;
 -- Lấy danh sách sinh viên có phân trang
 DELIMITER //
@@ -295,6 +290,7 @@ END //
 
 DELIMITER ;
 -- Xóa sinh viên
+
 DELIMITER //
 
 CREATE PROCEDURE deactivate_and_delete_student(IN p_student_id INT)
@@ -302,19 +298,19 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM student WHERE id = p_student_id) THEN
         SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'Không tìm thấy sinh viên có ID này.';
+    ELSEIF EXISTS (SELECT 1 FROM enrollment WHERE student_id = p_student_id) THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Sinh viên này đang đăng ký khóa học, không thể xóa.';
     ELSE
         UPDATE accounts
         SET student_id = NULL,
             status = 'inactive'
         WHERE student_id = p_student_id;
-
-        -- Xóa sinh viên
         DELETE FROM student WHERE id = p_student_id;
     END IF;
 END //
 
 DELIMITER ;
-
 -- Tìm kiếm sinh viên theo tên, email hoặc ID
 DELIMITER //
 
@@ -531,6 +527,7 @@ END //
 
 DELIMITER ;
 -- Sap xep va phan trang danh sách đăng ký khóa học
+
 DELIMITER $$
 
 CREATE PROCEDURE GetEnrollmentsSortedPaged(
@@ -540,12 +537,22 @@ CREATE PROCEDURE GetEnrollmentsSortedPaged(
     IN pageSize INT
 )
 BEGIN
+    DECLARE colName VARCHAR(255);
+    DECLARE orderByCol VARCHAR(255);
     SET @startRow = (page - 1) * pageSize;
+
+    IF sortColumn = 'course_name' THEN
+        SET orderByCol = 'c.name';
+    ELSEIF sortColumn = 'registered_at' THEN
+        SET orderByCol = 'e.registered_at';
+    ELSE
+        SET orderByCol = 'e.id';
+    END IF;
 
     SET @sql = CONCAT('SELECT e.id, e.student_id, e.course_id, e.registered_at, e.status, c.name AS course_name
                        FROM Enrollment e
                        INNER JOIN Course c ON e.course_id = c.id
-                       ORDER BY ', sortColumn, ' ', sortOrder, '
+                       ORDER BY ', orderByCol, ' ', sortOrder, '
                        LIMIT ', @startRow, ', ', pageSize);
 
     PREPARE stmt FROM @sql;
@@ -554,6 +561,7 @@ BEGIN
 END $$
 
 DELIMITER ;
+
 
 -- Lấy tổng số bản ghi trong bảng enrollment
 DELIMITER $$
@@ -780,16 +788,20 @@ BEGIN
 END$$
 DELIMITER ;
 --
+
 DELIMITER $$
+
 CREATE PROCEDURE GetStudentCountPerCourse()
 BEGIN
-    SELECT c.name AS course_name, COUNT(e.student_id) AS student_count
+    SELECT c.name AS course_name,
+           COUNT(e.student_id) AS student_count
     FROM course c
-             JOIN enrollment e ON c.id = e.course_id
-    WHERE e.status = 'confirm'
+             LEFT JOIN enrollment e ON c.id = e.course_id AND e.status = 'confirm'
     GROUP BY c.name;
 END$$
+
 DELIMITER ;
+
 -- Lấy top 5 khóa học có số lượng sinh viên đăng ký nhiều nhất
 DELIMITER $$
 
@@ -819,3 +831,15 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+
+
+
+
+
+
+
+
+
+
+

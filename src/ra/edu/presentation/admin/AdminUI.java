@@ -222,9 +222,16 @@ public class AdminUI {
         boolean isAdded = courseServiceImp.save(newCourse);
         if (isAdded) {
             System.out.println(Color.GREEN + "Thêm khóa học thành công." + Color.RESET);
+            System.out.println(Color.CYAN + "\nThông tin khóa học vừa thêm:");
+            System.out.println(Color.YELLOW + "ID: " + newCourse.getId());
+            System.out.println("Tên khóa học: " + newCourse.getName());
+            System.out.println("Số buổi học: " + newCourse.getDuration());
+            System.out.println("Giảng viên: " + newCourse.getInstructor());
+            System.out.println("Ngày tạo: " + newCourse.getCreateAt() + Color.RESET);
         } else {
             System.out.println(Color.RED + "Thêm khóa học thất bại." + Color.RESET);
         }
+
     }
 
     public static void updateCourse(CourseServiceImp courseServiceImp) {
@@ -296,7 +303,6 @@ public class AdminUI {
             }
         }
 
-        // Nếu không cập nhật thì giữ nguyên
         if (updatedCourse.getName() == null) {
             updatedCourse.setName(existingCourse.getName());
         }
@@ -331,13 +337,29 @@ public class AdminUI {
     public static void deleteCourse(Scanner sc, CourseServiceImp courseServiceImp) {
         int deleteId = Validator.validateInteger(Color.WHITE + "Nhập ID khóa học muốn xóa: " + Color.RESET, sc);
 
-        System.out.print(Color.YELLOW + "Bạn có chắc chắn muốn xóa khóa học với ID " + deleteId + "? (y/n): " + Color.RESET);
+        Course course = (Course) courseServiceImp.getById(deleteId);
+
+        if (course == null) {
+            System.out.println(Color.RED + "Không tìm thấy khóa học với ID: " + deleteId + Color.RESET);
+            return;
+        }
+
+        System.out.println(Color.CYAN + "\nThông tin khóa học muốn xóa:");
+        System.out.println(Color.YELLOW + "ID: " + course.getId());
+        System.out.println("Tên khóa học: " + course.getName());
+        System.out.println("Số buổi học: " + course.getDuration());
+        System.out.println("Giảng viên: " + course.getInstructor());
+        System.out.println("Ngày tạo: " + course.getCreateAt() + Color.RESET);
+
+        System.out.print(Color.YELLOW + "\nBạn có chắc chắn muốn xóa khóa học trên? (y/n): " + Color.RESET);
         String confirm = sc.nextLine().trim().toLowerCase();
 
         if (confirm.equals("y") || confirm.equals("yes")) {
             boolean isDeleted = courseServiceImp.delete(deleteId);
             if (isDeleted) {
                 System.out.println(Color.GREEN + "Xóa khóa học thành công." + Color.RESET);
+            } else {
+                System.out.println(Color.RED + "Xóa khóa học thất bại." + Color.RESET);
             }
         } else {
             System.out.println(Color.CYAN + "Đã hủy thao tác xóa khóa học." + Color.RESET);
@@ -367,7 +389,7 @@ public class AdminUI {
                 System.out.println(Color.BLUE + "╠═════╬════════════════════════════════════════════╬══════════╬═══════════════════════════════╬════════════╣" + Color.RESET);
 
                 if (courses.isEmpty()) {
-                    System.out.printf(Color.RED + "║ %-94s ║\n" + Color.RESET, "Không tìm thấy khóa học nào với tên chứa: " + keyword);
+                    System.out.printf(Color.RED + "║ %-104s ║\n" + Color.RESET, "Không tìm thấy khóa học nào với tên chứa: " + keyword);
                 } else {
                     for (Course course : courses) {
                         System.out.printf(Color.WHITE + "║ %-3s ║ %-42s ║ %-8s ║ %-29s ║ %-10s ║\n" + Color.RESET,
@@ -438,7 +460,7 @@ public class AdminUI {
                     System.out.println(Color.MAGENTA + "\nChọn 0 để quay lại menu chính." + Color.RESET);
                     String choice = sc.nextLine().trim().toLowerCase();
                     if (choice.equals("0")) {
-                        System.out.println(Color.YELLOW + "⬅ Quay lại menu chính..." + Color.RESET);
+                        System.out.println(Color.YELLOW + "Quay lại menu chính..." + Color.RESET);
                         continueSearch = false;
                     } else {
                         System.out.println(Color.RED + "Lựa chọn không hợp lệ." + Color.RESET);
@@ -717,6 +739,15 @@ public class AdminUI {
 
         if (isAdded) {
             System.out.println(Color.GREEN + "Thêm sinh viên thành công." + Color.RESET);
+            System.out.println(Color.CYAN + "\n--- Thông tin sinh viên vừa thêm ---" + Color.RESET);
+            System.out.printf(Color.YELLOW + "%-5s | %-20s | %-15s | %-10s | %-10s\n" + Color.RESET,
+                    "ID", "Họ tên", "Email", "SĐT", "Giới tính");
+            System.out.printf(Color.WHITE + "%-5d | %-20s | %-15s | %-10s | %-10s\n" + Color.RESET,
+                    newStudent.getId(),
+                    newStudent.getName(),
+                    newStudent.getEmail(),
+                    newStudent.getPhone(),
+                    newStudent.isStatus() ? "Nam" : "Nữ");
         } else {
             System.out.println(Color.RED + "Thêm sinh viên thất bại." + Color.RESET);
         }
