@@ -680,7 +680,7 @@ public class StudentUI {
 
         String inputEmail;
         while (true) {
-            inputEmail = Validator.validateNonEmptyString(Color.WHITE + "Nhập email của bạn để xác nhận: " + Color.RESET,sc);
+            inputEmail = Validator.validateEmail(Color.WHITE + "Nhập email của bạn để xác nhận: " + Color.RESET,sc);
 
             if (inputEmail.equalsIgnoreCase(currentAccount.getEmail())) {
                 break;

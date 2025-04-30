@@ -1,6 +1,8 @@
 package ra.edu.business.dao.student;
 
 import ra.edu.business.config.ConnectionDB;
+import ra.edu.business.model.account.Account;
+import ra.edu.business.model.account.Role;
 import ra.edu.business.model.course.Course;
 import ra.edu.business.model.enrollment.Enrollment;
 import ra.edu.business.model.enrollment.Status;
@@ -71,35 +73,48 @@ public class StudentDAOImp implements StudentDAO{
         try (Connection conn = ConnectionDB.openConnection();
              CallableStatement callSt = conn.prepareCall(sql)) {
 
-            // Set các tham số IN cho thủ tục
             callSt.setString(1, student.getName());
             callSt.setDate(2, Date.valueOf(student.getBirthday()));
             callSt.setString(3, student.getEmail());
             callSt.setBoolean(4, student.isStatus());
             callSt.setString(5, student.getPhone());
 
-            // Đăng ký tham số OUT cho số lượng dòng bị ảnh hưởng
-            callSt.registerOutParameter(6, Types.INTEGER);
+            callSt.registerOutParameter(6, Types.INTEGER); // OUT parameter để lấy rows affected
 
             boolean hasResult = callSt.execute();
 
-            if (hasResult) {
-                try (ResultSet rs = callSt.getResultSet()) {
+            int rowsAffected = callSt.getInt(6); // lấy rows affected
+
+            if (rowsAffected > 0) {
+                // Sau khi thêm thành công, lấy id mới nhất
+                try (PreparedStatement ps = conn.prepareStatement("SELECT LAST_INSERT_ID()");
+                     ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        String password = rs.getString("password");
-                        String email = rs.getString("email");
-                        String message = rs.getString("message");
-
-                        System.out.println(Color.GREEN + "Tài khoản tạo thành công cho email: " + email + Color.RESET);
-                        System.out.println(Color.YELLOW + "Mật khẩu tạm thời: " + password + Color.RESET);
-
-                        student.setGeneratedPassword(password);
+                        int newId = rs.getInt(1);
+                        student.setId(newId); // Gán ID mới vào student
                     }
                 }
-            }
 
-            int rowsAffected = callSt.getInt(6);
-            return rowsAffected > 0;
+                // Lấy kết quả trả về password, email, message
+                if (hasResult) {
+                    try (ResultSet rs = callSt.getResultSet()) {
+                        if (rs.next()) {
+                            String password = rs.getString("password");
+                            String email = rs.getString("email");
+                            String message = rs.getString("message");
+
+                            System.out.println(Color.GREEN + "Tài khoản tạo thành công cho email: " + email + Color.RESET);
+                            System.out.println(Color.YELLOW + "Mật khẩu tạm thời: " + password + Color.RESET);
+
+                            student.setGeneratedPassword(password);
+                        }
+                    }
+                }
+
+                return true;
+            } else {
+                return false;
+            }
 
         } catch (SQLException e) {
             if (e.getMessage().contains("Email đã tồn tại trong hệ thống")) {
@@ -110,8 +125,6 @@ public class StudentDAOImp implements StudentDAO{
             return false;
         }
     }
-
-
 
     @Override
     public boolean update(Student student) {
@@ -390,5 +403,4 @@ public class StudentDAOImp implements StudentDAO{
 
         return pageInfo;
     }
-
 }

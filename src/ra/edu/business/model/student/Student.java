@@ -1,6 +1,7 @@
 package ra.edu.business.model.student;
 
 import ra.edu.business.model.InputTable;
+import ra.edu.business.model.account.Account;
 import ra.edu.validate.student.StudentValidator;
 
 import java.time.LocalDate;
@@ -125,8 +126,12 @@ public class Student implements InputTable<Student> {
 
     @Override
     public void inputData(Scanner sc, List<Student> studentList) {
+
+    }
+
+    public void inputDataStudent(Scanner sc, List<Student> studentList, List<Account> accountList) {
         this.name = StudentValidator.validateName("Nhập họ tên: ", sc);
-        this.email = StudentValidator.validateEmailA("Nhập email sinh viên: ", sc, studentList);
+        this.email = StudentValidator.validateEmailA("Nhập email sinh viên: ", sc, accountList);
         this.birthday = StudentValidator.validateDob("Nhập ngày sinh sinh viên: ", sc);
         this.phone = StudentValidator.validatePhone("Nhập số điện thoại sinh viên: ", sc, studentList);
         this.status = StudentValidator.validateSex("Nhập giới tính sinh viên (true/false): ", sc);

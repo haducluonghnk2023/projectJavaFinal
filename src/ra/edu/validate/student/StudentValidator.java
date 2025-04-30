@@ -1,5 +1,6 @@
 package ra.edu.validate.student;
 
+import ra.edu.business.model.account.Account;
 import ra.edu.business.model.student.Student;
 import ra.edu.utils.Color;
 import ra.edu.validate.Validator;
@@ -70,7 +71,7 @@ public class StudentValidator {
         }
     }
 
-    public static String validateEmailA(String message, Scanner sc, List<Student> studentList) {
+    public static String validateEmailA(String message, Scanner sc, List<Account> accountList) {
         while (true) {
             System.out.print(message);
             String email = sc.nextLine().trim();
@@ -81,7 +82,7 @@ public class StudentValidator {
                 System.out.println("Email không được vượt quá 100 ký tự.");
             } else if (!isValidEmailFormat(email)) {
                 System.out.println("Email không hợp lệ. Vui lòng nhập lại.");
-            } else if (isEmailExistsA(email, studentList)) {
+            } else if (isEmailExistsA(email, accountList)) {
                 System.out.println(Color.RED + "Email này đã tồn tại trong hệ thống. Vui lòng chọn email khác." + Color.RESET);
             } else {
                 return email;
@@ -117,9 +118,9 @@ public class StudentValidator {
         return false;
     }
 
-    public static boolean isEmailExistsA(String email, List<Student> studentList) {
-        for (Student s : studentList) {
-            if (s.getEmail().equalsIgnoreCase(email)) {
+    public static boolean isEmailExistsA(String email, List<Account> accountList) {
+        for (Account a : accountList) {
+            if (a.getEmail().equalsIgnoreCase(email)) {
                 return true;
             }
         }
@@ -219,7 +220,7 @@ public class StudentValidator {
 
     public static int validatePageSize(Scanner sc) {
         while (true) {
-            String input = Validator.validateNonEmptyString(Color.WHITE + "Nhập số lượng hiển thị mỗi trang (1 - 100): " + Color.RESET, sc);
+            String input = Validator.validateNonEmptyString( Color.WHITE + "Nhập số lượng hiển thị mỗi trang (1 - 100): " + Color.RESET, sc);
             try {
                 int pageSize = Integer.parseInt(input);
                 if (pageSize >= 1 && pageSize <= 100) {
